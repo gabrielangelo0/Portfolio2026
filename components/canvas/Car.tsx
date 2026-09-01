@@ -116,8 +116,6 @@ export function Car() {
   useFrame((state, rawDelta) => {
     const rb = body.current;
     if (!rb) return;
-    (window as unknown as Record<string, unknown>).__rb = rb;
-    (window as unknown as Record<string, unknown>).__visual = visual.current;
     const delta = Math.min(rawDelta, 1 / 30);
 
     const rot = rb.rotation();

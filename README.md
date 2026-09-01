@@ -111,6 +111,11 @@ coincidir com o ponto em que os pneus tocam o chão.
   velocidade. Com o atrito de Coulomb do Rapier o chão freava o carro antes do motor vencer.
 - **Sem tunneling**: `timeStep` fixo em 1/60, CCD ligado no carro e chão com 10 unidades de
   espessura — em um frame longo (aba em segundo plano) o carro não atravessa o mundo.
+- **Inclinação nas rampas**: o corpo físico tem pitch e roll travados
+  (`enabledRotations={[false, true, false]}`) para nunca capotar e deixar o jogador
+  preso. A inclinação é visual: quatro raycasts medem a altura do chão à frente,
+  atrás e dos dois lados, e o modelo é rotacionado para acompanhar a rampa. No ar,
+  sem contato, ele volta suavemente à horizontal.
 - **Rodas**: os grupos das rodas usam ordem de Euler `YXZ` — o esterço (Y) tem que
   ser aplicado antes do giro do pneu (X), senão a roda cambaleia nas curvas em vez
   de girar no próprio eixo. O ângulo vem do raio real (ω = v / r) e o acumulador
