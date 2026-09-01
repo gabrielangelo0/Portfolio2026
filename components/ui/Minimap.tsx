@@ -200,9 +200,9 @@ export function Minimap({ onExpand }: { onExpand: () => void }) {
   }, [draw]);
 
   return (
-    <button className="minimap" onClick={onExpand} title="Abrir o mapa (M)">
+    <button className="minimap" onClick={onExpand} title="Open the map (M)">
       <canvas ref={canvas} style={{ width: SIZE, height: SIZE }} />
-      <span className="minimap__badge">Mapa · M</span>
+      <span className="minimap__badge">Map · M</span>
     </button>
   );
 }
@@ -236,8 +236,8 @@ export function WorldMap({ onClose }: { onClose: () => void }) {
     <div className="worldmap" onClick={onClose}>
       <div className="worldmap__panel" onClick={(event) => event.stopPropagation()}>
         <header className="worldmap__header">
-          <h2>Mapa</h2>
-          <button className="worldmap__close" onClick={onClose} aria-label="Fechar o mapa">
+          <h2>Map</h2>
+          <button className="worldmap__close" onClick={onClose} aria-label="Close the map">
             ✕
           </button>
         </header>
@@ -247,7 +247,7 @@ export function WorldMap({ onClose }: { onClose: () => void }) {
             className="worldmap__start"
             style={{ left: `${toPercent(START_PAD.x)}%`, top: `${toPercent(START_PAD.z)}%` }}
           >
-            largada
+            start
           </div>
 
           {projects.map((project) => (
@@ -281,7 +281,7 @@ export function WorldMap({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="worldmap__hint">
-          Clique em uma seção para ir direto até ela · <kbd>M</kbd> ou <kbd>Esc</kbd> fecha
+          Click a section to drive straight there · <kbd>M</kbd> or <kbd>Esc</kbd> closes
         </p>
       </div>
     </div>

@@ -8,23 +8,23 @@ import { CarModel } from "@/components/canvas/CarModel";
 
 /** Ângulos pré-definidos, para comparar rapidamente com as fotos de referência. */
 const VIEWS: Record<string, [number, number, number]> = {
-  frente: [0.6, 1.1, 5.2],
-  lateral: [5.4, 1.0, 0.2],
-  traseira: [-1.1, 1.2, -5.2],
+  front: [0.6, 1.1, 5.2],
+  side: [5.4, 1.0, 0.2],
+  rear: [-1.1, 1.2, -5.2],
   "3-4": [3.6, 1.6, 3.8],
-  "3-4-tras": [-3.4, 1.5, -3.6],
-  topo: [0.1, 8.5, 0.6],
-  roda: [2.1, 1.0, 2.3],
-  grade: [0.15, 0.55, 2.5],
+  "3-4-rear": [-3.4, 1.5, -3.6],
+  top: [0.1, 8.5, 0.6],
+  wheel: [2.1, 1.0, 2.3],
+  grille: [0.15, 0.55, 2.5],
   parabrisa: [0.6, 1.7, 2.7],
 };
 
 /** Alvo da órbita por vista; sem isso a vista da roda mira o meio do carro. */
 const TARGETS: Record<string, [number, number, number]> = {
   parabrisa: [0, 0.92, 0.55],
-  grade: [0, 0.33, 1.35],
-  roda: [0.45, 0.25, 0.84],
-  topo: [0, 0.5, 0],
+  grille: [0, 0.33, 1.35],
+  wheel: [0.45, 0.25, 0.84],
+  top: [0, 0.5, 0],
 };
 
 /**

@@ -1,207 +1,194 @@
-# Portfólio 3D dirigível
+# Drivable 3D portfolio
 
-Portfólio interativo inspirado em [bruno-simon.com](https://bruno-simon.com/): você dirige um
-carro low-poly por uma cena 3D e cada área do mundo abre uma seção do portfólio.
+An interactive portfolio inspired by [bruno-simon.com](https://bruno-simon.com/): you
+drive a low-poly car through a 3D valley, and each area of the world opens a section
+of the portfolio.
 
-Feito com **Next.js (App Router) + React Three Fiber + Rapier**, sem nenhum asset externo —
-todo o cenário é montado com geometrias primitivas, então o carregamento é instantâneo.
+Built with **Next.js (App Router) + React Three Fiber + Rapier**, with **no external
+assets** — the car, the scenery, the audio and the map are all generated in code, so
+there is nothing to download and it works offline.
 
-## Rodando
+## Running
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abra http://localhost:3000.
+Open http://localhost:3000.
 
-Build de produção:
+Production build:
 
 ```bash
 npm run build && npm start
 ```
 
-## Controles
+## Controls
 
-| Ação | Teclado | Toque |
+| Action | Keyboard | Touch |
 | --- | --- | --- |
-| Acelerar / ré | `W` `S` ou ↑ ↓ | pedais **Acelerar** e **Ré**, à direita |
-| Esterçar | `A` `D` ou ← → | volante analógico, à esquerda |
-| Freio | `Espaço` | — |
-| Voltar à largada | `R` | botão "Reiniciar posição" |
-| Abrir o mapa | `M` | tocar no minimapa |
+| Throttle / reverse | `W` `S` or ↑ ↓ | **Throttle** and **Reverse** pedals, bottom right |
+| Steer | `A` `D` or ← → | analog wheel, bottom left |
+| Brake | `Space` | — |
+| Back to start | `R` | "Restart" button |
+| Open the map | `M` | tap the minimap |
 
-A tração é relativa ao carro (`W` acelera, `S` dá ré), mas **o lado segue a tela**:
-apertar `D` significa "vá para a direita da tela" e o carro esterça até se alinhar.
-Sem isso, com o carro vindo na direção da câmera os comandos laterais aparecem
-invertidos — o problema clássico de câmera fixa.
+Steering is **direct**, like any racing game: `A` and `D` turn the car's wheel, and the
+physics mirrors the command in reverse — which is what a real car does with its wheels
+turned. On mobile the analog wheel only steers; the pedals provide traction.
 
-A direção é **direta**, como em qualquer jogo de corrida: `A` e `D` esterçam o
-volante do carro, e a física espelha o comando em marcha à ré — que é o que um carro
-de verdade faz com as rodas viradas. No celular o volante analógico só esterça; quem
-dá tração é o pedal.
+There was an experiment with **screen-relative steering** (pressing `D` would mean "go
+right on screen" even with the car driving towards the camera, with the turn direction
+decided on key-down and locked while held). It works as specified, but it confuses in
+practice: the command stops matching the wheel. It is kept in
+[Car.tsx](components/canvas/Car.tsx) behind the `SCREEN_RELATIVE_STEERING` constant —
+flip it to `true` to bring it back.
 
-Houve um experimento de **direção relativa à tela** (apertar `D` significaria "vá
-para a direita da tela" mesmo com o carro vindo na direção da câmera, com o sentido
-decidido no toque e travado enquanto a tecla ficasse pressionada). Ele funciona como
-especificado, mas confunde na prática: o comando deixa de corresponder ao volante.
-Ficou guardado em [Car.tsx](components/canvas/Car.tsx) atrás da constante
-`SCREEN_RELATIVE_STEERING` — basta pôr em `true` para reativar.
+The section list in the corner is also a shortcut: clicking an entry drives the car
+straight to that zone, for visitors who would rather not drive.
 
-A lista de seções no canto da tela também é um atalho: clicar em um item leva o carro
-direto até a zona correspondente, para quem não quiser dirigir.
+## The scenery
 
-## O cenário
+A green valley ringed by mountains, with forest, a hamlet and a lake — all generated in
+code:
 
-Um vale verde cercado de serra, com floresta, vilarejo e lago — tudo gerado por
-código, sem nenhum asset:
+- **the climb**: the middle of the valley is flat (that is where the start, the sections
+  and the ramps live) and the ground rises towards the rim, so driving outwards means
+  climbing. The visible mesh and the collider come from the same height function in
+  [lib/terrain.ts](lib/terrain.ts), and the collider *is* that mesh (a trimesh), so the
+  physical ground cannot drift from what you see;
+- **mountains** in three rings, each paler and bluer than the last, with snow on the far
+  peaks. Their heights are deliberately modest: taller peaks eat the whole sky at the
+  game's camera angle;
+- **forest** of pines, broadleaves, bushes and rocks, drawn with `InstancedMesh` (one
+  draw call per type, not per tree) and tinted from a palette so the woods don't look
+  flat. Density grows with the cube of the distance from the centre: thick at the rim,
+  sparse in the middle, otherwise the car spends the whole time dodging trunks;
+- **hamlet** of cottages with gable roofs, chimneys and lit windows;
+- **sky** as a gradient dome. The drei `<Sky>` covered the whole scene in white at this
+  camera angle, so the shader is hand-written — and it matches the fog better.
 
-- **serra** em três anéis de cones, cada um mais claro e azulado que o anterior;
-  os picos do fundo ganham neve. As alturas são contidas de propósito: com picos
-  altos demais a serra come o céu inteiro no enquadramento do jogo;
-- **floresta** com pinheiros, folhosas, arbustos e pedras, em `InstancedMesh` (uma
-  chamada de desenho por tipo, não por árvore) e verdes sorteados para a mata não
-  ficar chapada. A densidade cresce com o cubo da distância ao centro: fecha nas
-  beiradas e rareia no miolo, senão o carro passa o tempo todo desviando;
-- **vilarejo** de casas com telhado de duas águas, chaminé e janelas acesas;
-- **céu** com gradiente próprio num domo. O `<Sky>` do drei cobria a cena inteira
-  de branco neste enquadramento, então o shader é escrito à mão — e ainda combina
-  melhor com a névoa.
+## The car
 
-O chão de colisão continua plano: o relevo fica todo fora da cerca, o que dá a
-paisagem sem quebrar a física já calibrada do carro.
+A compact hatchback modelled from reference photos, entirely in code — no `.glb`. The
+side profile is an extruded `THREE.Shape` with the wheel arches cut into the outline.
+A plain extrusion, though, looks like a tube: `shapeBody()` narrows the width at the
+roof, the sills and the ends, crowns the bonnet and roof towards the edges, and makes
+the front and rear convex in plan.
 
-## Mapa
+The **front** is assembled from its own pieces, all drawn in absolute width/height
+coordinates and passed through `curveToNose()`, which moves them onto the bumper and
+curves them with it — that is what stops the headlights and grille from floating in
+front of the bodywork:
 
-Minimapa no estilo GTA: o carro fica fixo no centro apontando para cima e o mundo
-gira em volta; seções fora do alcance viram blips presos na borda, indicando a
-direção. Clicar nele (ou `M`) abre o mapa inteiro, onde cada seção é um botão que
-leva o carro até lá.
+- boomerang headlights (both lenses in a single `ExtrudeGeometry`) with DRL, projector,
+  reflector and amber indicator inside;
+- a trapezoidal lower grille whose honeycomb is drawn to a `<canvas>` and used as a
+  texture — the hexagons in geometry would cost hundreds of meshes. The texture is
+  tileable and uses `RepeatWrapping`: `ExtrudeGeometry`'s UVs are world coordinates, so
+  half the grille has negative `u` and, with the default clamp, the texture splits down
+  the middle;
+- a black bridge with an oval badge, chrome trim, bumper wings and a lower lip;
+- two bonnet creases converging on the badge.
 
-A geometria do cenário mora em [lib/world.ts](lib/world.ts) — arena, largada,
-rampas, caixas e o gerador procedural de árvores — porque o mundo 3D e o mapa
-desenham os mesmos objetos: duplicar as posições faria o mapa mentir assim que o
-cenário mudasse. A pose do carro é publicada em [lib/carState.ts](lib/carState.ts),
-fora do React, e o minimapa desenha no próprio `requestAnimationFrame`; passar por
-estado faria o overlay renderizar 60 vezes por segundo.
+Scale: 1 unit ≈ 1.43 m (length 2.9 = 4.15 m).
 
-## Som
-
-Todo o áudio é **sintetizado em Web Audio** — nenhum arquivo para baixar, no mesmo
-espírito do resto do projeto ([lib/audio.ts](lib/audio.ts)):
-
-- **motor procedural**: três parciais por um filtro passa-baixa, com frequência,
-  corte e ganho acompanhando velocidade e acelerador — reage de verdade, em vez de
-  tocar um loop gravado;
-- **derrapagem**: ruído em passa-banda que só aparece quando o carro escorrega de
-  lado com velocidade;
-- **trilha ambiente**: progressão Am–F–C–G em pad, com melodia em pentatônica de lá
-  menor sorteada a cada compasso, agendada com lookahead (`setInterval` sozinho não
-  é preciso o bastante para música);
-- **efeitos**: batida (ruído + "toc" grave, com a intensidade vinda da velocidade no
-  instante da colisão) e um sino de duas notas ao chegar numa seção.
-
-O contexto de áudio nasce dentro do clique em "Entrar no carro" — a política de
-autoplay exige um gesto do usuário — e é suspenso quando a aba sai de vista. O botão
-🔊 no HUD silencia tudo. Se o navegador recusar criar o contexto, o jogo entra normal,
-só que mudo: o áudio nunca bloqueia a entrada.
-
-## Estrutura
+To work on the model, use the workshop at **`/inspect`**, which shows the car alone on a
+light background with free orbit:
 
 ```
-app/                 layout, página e estilos globais
+/inspect?view=side                     # front, rear, side, 3-4, 3-4-rear, top, wheel, grille
+/inspect?view=wheel&steer=1&spin=0.8   # inspect steering and wheel spin, frozen
+```
+
+## The map
+
+A GTA-style minimap: the car sits at the centre pointing up and the world rotates around
+it; sections out of range become blips pinned to the rim, showing their direction.
+Clicking it (or `M`) opens the full map, where every section is a button that drives the
+car there.
+
+The scenery geometry lives in [lib/world.ts](lib/world.ts) — arena, start pad, ramps,
+crates and the procedural tree generator — because the 3D world and the map draw the
+same objects: duplicating the positions would make the map lie the moment the scenery
+changed. The car's pose is published through [lib/carState.ts](lib/carState.ts), outside
+React, and the minimap draws on its own `requestAnimationFrame`; going through state
+would re-render the overlay sixty times a second.
+
+## Sound
+
+All audio is **synthesised with Web Audio** — no files ([lib/audio.ts](lib/audio.ts)):
+
+- **procedural engine**: three partials through a low-pass filter, with frequency, cutoff
+  and gain following speed and throttle — it actually reacts, instead of looping a
+  recording;
+- **tyre scrub**: band-passed noise that only appears when the car slides sideways with
+  speed;
+- **ambient score**: an Am–F–C–G pad with a melody drawn from the A minor pentatonic,
+  scheduled with lookahead (`setInterval` alone isn't precise enough for music);
+- **effects**: impacts (noise plus a low thump, intensity taken from the speed at the
+  moment of contact) and a two-note chime on reaching a section.
+
+The audio context is created inside the click on "Get in the car" — autoplay policy
+requires a gesture — and is suspended when the tab goes away. The 🔊 button in the HUD
+mutes everything. If the browser refuses to create the context the site still opens,
+just silent: audio never blocks entry.
+
+## Structure
+
+```
+app/                 layout, page and global styles
+  inspect/           car model workshop (see above)
 components/
-  Scene.tsx          junta o Canvas (client-only) com a UI em HTML
+  Scene.tsx          joins the client-only Canvas with the HTML UI
   canvas/
-    Experience.tsx   Canvas, luzes, névoa e o mundo físico
-    Car.tsx          física arcade do carro, câmera e detecção de zonas
-    CarModel.tsx     carroceria low-poly (hatch compacto) modelada por código
-    World.tsx        chão, muros, rampas, caixas e cenário procedural
-    ProjectZone.tsx  plataforma, feixe de luz e rótulo de cada seção
-  ui/                intro, HUD, painel de conteúdo e controles de toque
-app/inspect/         oficina do modelo do carro (ver abaixo)
-lib/data.ts          SEU CONTEÚDO: perfil e seções do portfólio
-lib/controls.ts      estado de input compartilhado (fora do React, por performance)
-lib/audio.ts         motor, trilha e efeitos, todos sintetizados
-store/               estado da aplicação (zustand)
+    Experience.tsx   Canvas, sky, lights, fog and the physics world
+    Car.tsx          arcade physics, camera and zone detection
+    CarModel.tsx     low-poly hatchback built from code
+    World.tsx        terrain, forest, hamlet, mountains, ramps and crates
+    ProjectZone.tsx  platform, light beam and label for each section
+  ui/                intro, HUD, content panel, map and touch controls
+lib/data.ts          YOUR CONTENT: profile and portfolio sections
+lib/terrain.ts       height function shared by the mesh and the collider
+lib/world.ts         scenery geometry shared with the minimap
+lib/controls.ts      shared input state (outside React, for performance)
+lib/audio.ts         engine, score and effects, all synthesised
+store/               application state (zustand)
 ```
 
-## Personalizando
+## Customising
 
-Todo o conteúdo vive em [`lib/data.ts`](lib/data.ts): nome, cargo, e-mail e a lista de
-seções. Cada seção tem `position: [x, 0, z]` — é onde o círculo colorido nasce no mundo.
-As zonas ficam num anel em volta da largada (`0, 0`), então vale manter os pontos
-espalhados e a pelo menos 8 unidades uns dos outros; o cenário procedural evita
-automaticamente essas áreas.
+All the content lives in [lib/data.ts](lib/data.ts): name, role, email and the list of
+sections. Each section has `position: [x, 0, z]` — where its coloured circle appears in
+the world. The sections sit in a ring around the start pad (`0, 0`); keep them spread
+out and at least 8 units apart, and keep them inside the flat middle of the valley
+(radius 28) so they don't end up on the slope. The procedural scenery avoids those
+areas automatically.
 
-## O carro
+## Implementation notes
 
-O carro é um hatch compacto modelado a partir de fotos de referência, inteiramente
-por código — nenhum arquivo `.glb`. A silhueta lateral é uma `THREE.Shape` extrudada,
-com as caixas de roda recortadas no próprio contorno. Uma extrusão pura, porém, vira
-um tubo: `shapeBody()` afina a largura no teto, nas saias e nas pontas, abaula capô e
-teto em direção às bordas e deixa frente e traseira convexas em planta.
-
-A **frente** é montada com peças próprias, todas desenhadas em coordenadas absolutas
-de largura e altura e passadas por `curveToNose()`, que as leva até o para-choque e as
-curva com ele — é isso que impede faróis e grade de boiarem à frente da lataria:
-
-- faróis em bumerangue (as duas lentes numa `ExtrudeGeometry` só), com DRL, projetor,
-  refletor e seta âmbar por dentro;
-- grade inferior trapezoidal (estreita em cima, alargando até a base) com colmeia
-  desenhada em `<canvas>` — os hexágonos em geometria custariam centenas de meshes.
-  A textura é tileável e usa `RepeatWrapping`: a UV da `ExtrudeGeometry` é a própria
-  coordenada do mundo, então metade da grade tem `u` negativo e, com o clamp padrão,
-  a textura "parte" no meio;
-- ponte preta com emblema oval, filetes cromados, asas do para-choque e lâmina inferior;
-- dois vincos no capô convergindo para o emblema.
-
-Os vidros são uma segunda extrusão, levemente maior que a lataria para aflorarem nas
-laterais e não serem cobertos no para-brisa e no vidro traseiro.
-
-Escala: 1 unidade ≈ 1,43 m (comprimento 2,9 = 4,15 m).
-
-Para mexer no modelo, use a oficina em **`/inspect`**, que mostra o carro isolado,
-em fundo claro e com órbita livre:
-
-```
-/inspect?view=lateral            # frente, traseira, lateral, 3-4, 3-4-tras, topo, roda
-/inspect?view=roda&steer=1&spin=0.8   # confere esterço e giro do pneu parados
-```
-
-`steer` vai de -1 a 1 (positivo = curva à direita do carro, mesma convenção do
-jogo) e `spin` é o giro do pneu em radianos. Serve para checar o eixo de rotação
-das rodas sem depender da física.
-
-Trocar de carro é editar `components/canvas/CarModel.tsx`. Se ao mudar as dimensões
-o carro passar a flutuar ou afundar, ajuste o `CuboidCollider` em
-[Car.tsx](components/canvas/Car.tsx): a base dele (`position.y - args[1]`) precisa
-coincidir com o ponto em que os pneus tocam o chão.
-
-## Notas de implementação
-
-- **Física arcade**: o collider do carro tem atrito zero (`frictionCombineRule: Min`) e
-  toda a aderência é simulada no `useFrame` — motor, grip lateral e esterço proporcional à
-  velocidade. Com o atrito de Coulomb do Rapier o chão freava o carro antes do motor vencer.
-- **Sem tunneling**: `timeStep` fixo em 1/60, CCD ligado no carro e chão com 10 unidades de
-  espessura — em um frame longo (aba em segundo plano) o carro não atravessa o mundo.
-- **Inclinação nas rampas**: o corpo físico tem pitch e roll travados
-  (`enabledRotations={[false, true, false]}`) para nunca capotar e deixar o jogador
-  preso. A inclinação é visual: quatro raycasts medem a altura do chão à frente,
-  atrás e dos dois lados, e o modelo é rotacionado para acompanhar a rampa. No ar,
-  sem contato, ele volta suavemente à horizontal.
-- **Sair de um obstáculo**: prensado contra algo, girar enfiaria a quina do carro
-  nele e o solver cancela a rotação — o jogador ficava preso apontando para a
-  parede e só saía dando ré na mão. Quando ele acelera, pede direção e mesmo assim
-  não sai do lugar, o carro recua sozinho o suficiente para descolar e esterçar.
-  Qual ponta mirar vem da *intenção* (`W` mira o nariz, `S` a traseira) e a
-  compensação do espelhamento vem da *velocidade real*: misturar as duas coisas
-  fazia o esterço inverter sozinho durante a manobra, e o carro oscilava no lugar.
-- **Rodas**: os grupos das rodas usam ordem de Euler `YXZ` — o esterço (Y) tem que
-  ser aplicado antes do giro do pneu (X), senão a roda cambaleia nas curvas em vez
-  de girar no próprio eixo. O ângulo vem do raio real (ω = v / r) e o acumulador
-  fica em [0, 2π) para não perder precisão com o tempo.
-- **Cena determinística**: as árvores e pedras usam um PRNG com semente fixa, então
-  servidor e cliente geram o mesmo cenário.
-- **Câmera responsiva**: em telas verticais ela se afasta e mira abaixo do carro, para o
-  painel de conteúdo não cobrir a ação.
+- **Arcade physics**: the car's collider has zero friction (`frictionCombineRule: Min`)
+  and all the grip is simulated in `useFrame` — engine, lateral grip and speed-dependent
+  steering. With Rapier's Coulomb friction the ground braked the car before the engine
+  could win.
+- **Hill hold**: with a frictionless collider nothing holds the car on a slope, so it
+  would roll back down on its own. A drag force applies below walking speed, without
+  spoiling a fast descent.
+- **Getting unstuck**: pinned against an obstacle, turning would drive the car's corner
+  into it and the solver cancels the rotation — the player was stuck facing the wall
+  with reverse as the only way out. Now, if they accelerate while asking for a turn and
+  still don't move, the car backs off just enough to steer. Which end to aim comes from
+  *intent* (`W` aims the nose, `S` the tail) and the mirroring compensation from *actual
+  velocity*: mixing the two made the steering flip mid-manoeuvre.
+- **No tunneling**: fixed `timeStep` of 1/60 and CCD on the car, so a long frame (a
+  backgrounded tab) can't push it through the world.
+- **Slope tilt**: the body has pitch and roll locked so it can never flip and strand the
+  player. The tilt is visual: four raycasts measure the ground ahead, behind and to each
+  side, and the model follows the slope, easing back to level in the air.
+- **Wheels**: the wheel groups use `YXZ` Euler order — steering (Y) has to be applied
+  before spin (X), or the wheel wobbles through corners instead of spinning on its axis.
+  The angle comes from the real radius (ω = v / r) and the accumulator stays in [0, 2π).
+- **Deterministic scene**: trees and rocks use a seeded PRNG, so server and client
+  generate the same world.
+- **Responsive camera**: on tall screens it pulls back and aims below the car, so the
+  content panel doesn't cover the action.

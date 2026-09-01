@@ -1,7 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useMemo, useRef } from "react";
-import { CuboidCollider, RigidBody } from "@react-three/rapier";
+import { CuboidCollider, RigidBody, TrimeshCollider } from "@react-three/rapier";
 import * as THREE from "three";
 import { projects } from "@/lib/data";
 import {
@@ -16,6 +16,7 @@ import {
   type SceneryItem,
   generateScenery,
 } from "@/lib/world";
+import { RESOLUTION, RISE_HEIGHT, terrainHeight } from "@/lib/terrain";
 import { ProjectZone } from "./ProjectZone";
 
 const GRASS = "#5b8c42";
@@ -46,7 +47,7 @@ function useInstances(
 
     items.forEach((item, index) => {
       const { y, scale: s } = apply(item, index);
-      position.set(item.position[0], y, item.position[2]);
+      position.set(item.position[0], terrainHeight(item.position[0], item.position[2]) + y, item.position[2]);
       quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), item.rotation);
       scale.set(s[0], s[1], s[2]);
       matrix.compose(position, quaternion, scale);
@@ -144,7 +145,11 @@ function Forest() {
           <CuboidCollider
             key={i}
             args={[0.28 * tree.scale, 1.2 * tree.scale, 0.28 * tree.scale]}
-            position={[tree.position[0], 1.2 * tree.scale, tree.position[2]]}
+            position={[
+              tree.position[0],
+              terrainHeight(tree.position[0], tree.position[2]) + 1.2 * tree.scale,
+              tree.position[2],
+            ]}
           />
         ))}
       </RigidBody>
@@ -156,7 +161,14 @@ function Cottage({ house }: { house: House }) {
   const { width, depth, height, wall, roof } = house;
 
   return (
-    <group position={house.position} rotation={[0, house.rotation, 0]}>
+    <group
+      position={[
+        house.position[0],
+        terrainHeight(house.position[0], house.position[2]),
+        house.position[2],
+      ]}
+      rotation={[0, house.rotation, 0]}
+    >
       <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[width, height, depth]} />
         <meshStandardMaterial color={wall} roughness={0.9} />
@@ -247,7 +259,7 @@ function Fence() {
     const mesh = postsRef.current;
     if (!mesh) return;
     posts.forEach(([x, z], i) => {
-      position.set(x, 0.55, z);
+      position.set(x, terrainHeight(x, z) + 0.55, z);
       quaternion.identity();
       scale.set(1, 1, 1);
       matrix.compose(position, quaternion, scale);
@@ -265,7 +277,7 @@ function Fence() {
       </instancedMesh>
       {/* travessas */}
       {[0.45, 0.85].map((y) => (
-        <group key={y}>
+        <group key={y} position={[0, RISE_HEIGHT, 0]}>
           {[-ARENA, ARENA].map((z) => (
             <mesh key={`z${z}`} position={[0, y, z]}>
               <boxGeometry args={[ARENA * 2, 0.1, 0.08]} />
@@ -285,24 +297,55 @@ function Fence() {
 }
 
 function Ground() {
+  // A colisão é a própria malha que aparece na tela (trimesh), não um
+  // heightfield paralelo: assim não há como o chão físico divergir do visual
+  // por ordem de índices ou escala.
+  const geometry = useMemo(() => {
+    const geo = new THREE.PlaneGeometry(ARENA * 2, ARENA * 2, RESOLUTION, RESOLUTION);
+    geo.rotateX(-Math.PI / 2);
+
+    const pos = geo.attributes.position as THREE.BufferAttribute;
+    for (let i = 0; i < pos.count; i++) {
+      pos.setY(i, terrainHeight(pos.getX(i), pos.getZ(i)));
+    }
+    pos.needsUpdate = true;
+    geo.computeVertexNormals();
+    return geo;
+  }, []);
+
+  const collision = useMemo(() => {
+    const position = geometry.attributes.position as THREE.BufferAttribute;
+    return {
+      vertices: new Float32Array(position.array),
+      indices: new Uint32Array(geometry.index!.array),
+    };
+  }, [geometry]);
+
   return (
     <>
-      <RigidBody type="fixed" friction={1.1}>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[ARENA * 2, ARENA * 2]} />
-          <meshStandardMaterial color={GRASS} roughness={1} />
-        </mesh>
-        <CuboidCollider args={[ARENA, 5, ARENA]} position={[0, -5, 0]} />
+      <RigidBody type="fixed" colliders={false} friction={1.1}>
+        <TrimeshCollider args={[collision.vertices, collision.indices]} />
       </RigidBody>
 
+      <mesh geometry={geometry} receiveShadow>
+        <meshStandardMaterial color={GRASS} roughness={1} flatShading />
+      </mesh>
+
       {/* campo que continua além da cerca até o pé da serra */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
-        <circleGeometry args={[ARENA * 4.5, 64]} />
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[0, RISE_HEIGHT - 0.6, 0]}
+        receiveShadow
+      >
+        <ringGeometry args={[ARENA * 1.02, ARENA * 4.5, 64]} />
         <meshStandardMaterial color={GRASS_DARK} roughness={1} />
       </mesh>
 
       {/* lago no sopé da serra */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[LAKE.x, 0.04, LAKE.z]}>
+      <mesh
+        rotation={[-Math.PI / 2, 0, 0]}
+        position={[LAKE.x, RISE_HEIGHT - 0.55, LAKE.z]}
+      >
         <circleGeometry args={[LAKE.radius, 48]} />
         <meshStandardMaterial color="#3f7f9c" roughness={0.15} metalness={0.5} />
       </mesh>
@@ -311,13 +354,14 @@ function Ground() {
 }
 
 function Walls() {
-  const height = 3;
+  const height = 4;
+  const base = RISE_HEIGHT; // a borda do vale fica no topo da encosta
   return (
     <RigidBody type="fixed" colliders={false}>
-      <CuboidCollider args={[ARENA, height, 0.5]} position={[0, height, -ARENA]} />
-      <CuboidCollider args={[ARENA, height, 0.5]} position={[0, height, ARENA]} />
-      <CuboidCollider args={[0.5, height, ARENA]} position={[-ARENA, height, 0]} />
-      <CuboidCollider args={[0.5, height, ARENA]} position={[ARENA, height, 0]} />
+      <CuboidCollider args={[ARENA, height, 0.5]} position={[0, base + height, -ARENA]} />
+      <CuboidCollider args={[ARENA, height, 0.5]} position={[0, base + height, ARENA]} />
+      <CuboidCollider args={[0.5, height, ARENA]} position={[-ARENA, base + height, 0]} />
+      <CuboidCollider args={[0.5, height, ARENA]} position={[ARENA, base + height, 0]} />
     </RigidBody>
   );
 }

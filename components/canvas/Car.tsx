@@ -17,13 +17,20 @@ import { carState } from "@/lib/carState";
 import { projects } from "@/lib/data";
 import { useGameStore } from "@/store/useGameStore";
 
-const ENGINE_FORCE = 26;
+const ENGINE_FORCE = 34;
 const REVERSE_FORCE = 16;
 const MAX_SPEED = 17;
 const MAX_REVERSE_SPEED = 7;
 const TURN_SPEED = 2.1;
 const GRIP = 6.5;
 const BRAKE = 3.2;
+/**
+ * Sem isto o carro desce a encosta de ré sozinho: o collider tem atrito zero
+ * (a aderência é toda simulada aqui), então nada o segura parado numa ladeira.
+ * Só age em baixa velocidade, para não atrapalhar quem desce a serra embalado.
+ */
+const HILL_HOLD = 9;
+const HILL_HOLD_MAX_SPEED = 4;
 const ZONE_RADIUS = 4.2;
 const SPAWN: [number, number, number] = [0, 1.2, 6];
 
@@ -236,6 +243,12 @@ export function Car() {
       rb.applyImpulse(impulse, true);
     } else if (throttle < 0 && signedSpeed > -MAX_REVERSE_SPEED) {
       impulse.copy(forward).multiplyScalar(REVERSE_FORCE * throttle * delta);
+      rb.applyImpulse(impulse, true);
+    }
+
+    // trava de ladeira
+    if (throttle === 0 && !input.brake && planarSpeed < HILL_HOLD_MAX_SPEED) {
+      impulse.copy(velocity).multiplyScalar(-HILL_HOLD * delta);
       rb.applyImpulse(impulse, true);
     }
 

@@ -26,31 +26,31 @@ function Intro() {
   return (
     <div className="intro">
       <div className="intro__card">
-        <p className="intro__eyebrow">Portfólio interativo</p>
+        <p className="intro__eyebrow">Interactive portfolio</p>
         <h1 className="intro__name">{profile.name}</h1>
         <p className="intro__role">{profile.role}</p>
         <p className="intro__tagline">{profile.tagline}</p>
-        <p className="intro__sound">Com som — dá para silenciar a qualquer momento.</p>
+        <p className="intro__sound">Sound on — you can mute it anytime.</p>
 
         <button className="intro__button" onClick={enter} autoFocus>
-          Entrar no carro
+          Get in the car
         </button>
 
         <ul className="intro__keys">
           <li>
-            <kbd>W</kbd> <kbd>S</kbd> acelerar e ré
+            <kbd>W</kbd> <kbd>S</kbd> throttle and reverse
           </li>
           <li>
-            <kbd>A</kbd> <kbd>D</kbd> esterçar
+            <kbd>A</kbd> <kbd>D</kbd> steer
           </li>
           <li>
-            <kbd>Espaço</kbd> freio
+            <kbd>Space</kbd> brake
           </li>
           <li>
-            <kbd>R</kbd> voltar ao início
+            <kbd>R</kbd> back to start
           </li>
           <li>
-            <kbd>M</kbd> mapa
+            <kbd>M</kbd> map
           </li>
         </ul>
       </div>
@@ -76,12 +76,12 @@ function Hud() {
           className="hud__reset"
           onClick={toggleMuted}
           aria-pressed={muted}
-          title={muted ? "Ligar o som" : "Silenciar"}
+          title={muted ? "Unmute" : "Mute"}
         >
-          {muted ? "🔇" : "🔊"} som
+          {muted ? "🔇" : "🔊"} sound
         </button>
         <button className="hud__reset" onClick={reset}>
-          Reiniciar <kbd>R</kbd>
+          Restart <kbd>R</kbd>
         </button>
       </div>
     </div>
@@ -126,7 +126,7 @@ function Compass() {
   return (
     <nav className="compass">
       <span className="compass__hint">
-        {activeZone ? "Você chegou" : "Dirija até um dos círculos coloridos"}
+        {activeZone ? "You made it" : "Drive to one of the colored circles"}
       </span>
       <ul>
         {projects.map((p) => (
@@ -134,7 +134,7 @@ function Compass() {
             <button
               className={activeZone === p.id ? "is-active" : ""}
               onClick={() => goToZone(p.id)}
-              title={`Ir direto para ${p.title}`}
+              title={`Jump straight to ${p.title}`}
             >
               <i style={{ background: p.color }} />
               {p.title}
@@ -142,7 +142,7 @@ function Compass() {
           </li>
         ))}
       </ul>
-      <span className="compass__note">clique para ir direto</span>
+      <span className="compass__note">click to jump</span>
     </nav>
   );
 }

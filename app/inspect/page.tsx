@@ -8,7 +8,7 @@ const InspectScene = dynamic(() => import("./InspectScene"), { ssr: false });
 /**
  * Oficina do modelo: /inspect?view=lateral para comparar com fotos de
  * referência sem precisar dirigir até um ângulo específico.
- * Views: frente, lateral, traseira, 3-4, 3-4-tras, topo.
+ * Views: front, side, rear, 3-4, 3-4-rear, top, wheel, grille.
  * Aceita ainda ?steer=-1..1 e ?spin=<radianos> para conferir as rodas paradas.
  */
 export default function InspectPage() {

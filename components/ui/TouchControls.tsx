@@ -71,7 +71,7 @@ function SteeringStick() {
       onPointerUp={end}
       onPointerCancel={end}
       role="slider"
-      aria-label="Volante"
+      aria-label="Steering"
       aria-valuemin={-1}
       aria-valuemax={1}
       aria-valuenow={0}
@@ -124,8 +124,8 @@ export function TouchControls() {
     <>
       <SteeringStick />
       <div className="pedals">
-        <Pedal action="reverse" label="R" hint="Ré" className="pedal--reverse" />
-        <Pedal action="throttle" label="▲" hint="Acelerar" className="pedal--throttle" />
+        <Pedal action="reverse" label="R" hint="Reverse" className="pedal--reverse" />
+        <Pedal action="throttle" label="▲" hint="Throttle" className="pedal--throttle" />
       </div>
     </>
   );
