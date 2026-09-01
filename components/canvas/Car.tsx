@@ -42,6 +42,22 @@ const CAMERA_OFFSET = new THREE.Vector3(0, 8, 18);
 
 const INPUT_DEAD_ZONE = 0.14;
 
+/**
+ * Direção relativa à tela — **desligada**, guardada de propósito.
+ *
+ * A ideia era corrigir a perspectiva: apertar D significaria "vá para a direita
+ * da tela" mesmo com o carro vindo na direção da câmera, com o sentido do giro
+ * decidido no instante do toque e travado enquanto a tecla ficasse pressionada
+ * (soltar e apertar recalculava). Funciona como especificado — os testes
+ * confirmam que o carro vai para o mesmo lado da tela nas duas orientações —
+ * mas na prática confunde mais do que ajuda: o comando deixa de corresponder ao
+ * volante e o jogador perde a noção de para que lado o carro vai virar.
+ *
+ * O padrão agora é o esterço direto de qualquer jogo de corrida. Para reativar
+ * o experimento, basta pôr esta constante em `true`.
+ */
+const SCREEN_RELATIVE_STEERING = false;
+
 const UP = new THREE.Vector3(0, 1, 0);
 const cameraForward = new THREE.Vector3();
 const cameraRight = new THREE.Vector3();
@@ -150,12 +166,10 @@ export function Car() {
     const signedSpeed = goingForward ? planarSpeed : -planarSpeed;
 
     // ---- intenção do jogador ----
-    // Tração é relativa ao carro (W acelera, S dá ré). O lado segue a tela, mas
-    // a perspectiva só entra **no instante em que a tecla é pressionada**: ali
-    // se decide para que lado do mundo girar para o carro ir ao lado da tela
-    // pedido, e esse sentido fica travado enquanto o jogador segura. Daí em
-    // diante é volante puro — o algoritmo não corrige nada por baixo, então a
-    // curva não "gruda" em direção nenhuma e dá para dar a volta completa.
+    // Direção direta, como em qualquer jogo de corrida: A e D esterçam o volante
+    // do carro, e a física espelha o comando em marcha à ré — que é o que um
+    // carro de verdade faz com as rodas viradas. O modo relativo à tela fica
+    // guardado atrás de SCREEN_RELATIVE_STEERING.
     let throttle = 0;
     let steer = 0;
 
@@ -166,27 +180,34 @@ export function Car() {
       const lateral = input.moveX;
       const holding = Math.abs(lateral) > INPUT_DEAD_ZONE;
 
-      if (holding && !steerHeld.current) {
-        camera.getWorldDirection(cameraForward);
-        cameraForward.setY(0).normalize();
-        cameraRight.crossVectors(cameraForward, UP).normalize();
-        desired.copy(cameraRight).multiplyScalar(Math.sign(lateral));
+      if (SCREEN_RELATIVE_STEERING) {
+        // Sentido decidido na borda de subida e travado enquanto a tecla fica
+        // pressionada — ver o comentário de SCREEN_RELATIVE_STEERING.
+        if (holding && !steerHeld.current) {
+          camera.getWorldDirection(cameraForward);
+          cameraForward.setY(0).normalize();
+          cameraRight.crossVectors(cameraForward, UP).normalize();
+          desired.copy(cameraRight).multiplyScalar(Math.sign(lateral));
 
-        // dando ré é a traseira que aponta para onde o carro vai
-        const heading =
-          throttle < 0
-            ? Math.atan2(-forward.x, -forward.z)
-            : Math.atan2(forward.x, forward.z);
-        const deviation = wrapAngle(Math.atan2(desired.x, desired.z) - heading);
-        steerSign.current = deviation >= 0 ? 1 : -1;
-      }
-      steerHeld.current = holding;
+          // dando ré é a traseira que aponta para onde o carro vai
+          const heading =
+            throttle < 0
+              ? Math.atan2(-forward.x, -forward.z)
+              : Math.atan2(forward.x, forward.z);
+          const deviation = wrapAngle(Math.atan2(desired.x, desired.z) - heading);
+          steerSign.current = deviation >= 0 ? 1 : -1;
+        }
+        steerHeld.current = holding;
 
-      if (holding) {
-        steer = steerSign.current * Math.min(Math.abs(lateral), 1);
-        // a física espelha o comando com velocidade negativa; desfaz aqui para
-        // o sentido de giro no mundo continuar sendo o mesmo
-        if (signedSpeed < -0.4) steer = -steer;
+        if (holding) {
+          steer = steerSign.current * Math.min(Math.abs(lateral), 1);
+          // a física espelha o comando com velocidade negativa; desfaz aqui
+          if (signedSpeed < -0.4) steer = -steer;
+        }
+      } else if (holding) {
+        // D vira o volante para a direita do carro. O sinal é negativo porque
+        // yaw positivo gira o nariz de +Z para +X, que é o lado esquerdo dele.
+        steer = -Math.max(-1, Math.min(1, lateral));
       }
     }
 

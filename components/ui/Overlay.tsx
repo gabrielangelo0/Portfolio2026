@@ -41,7 +41,7 @@ function Intro() {
             <kbd>W</kbd> <kbd>S</kbd> acelerar e ré
           </li>
           <li>
-            <kbd>A</kbd> <kbd>D</kbd> lado da tela
+            <kbd>A</kbd> <kbd>D</kbd> esterçar
           </li>
           <li>
             <kbd>Espaço</kbd> freio

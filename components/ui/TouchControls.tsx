@@ -17,8 +17,8 @@ function capturePointer(element: Element, pointerId: number) {
 const KNOB_TRAVEL = 0.62; // fração do raio que o polegar percorre
 
 /**
- * Volante analógico: o polegar escolhe o lado **da tela** para onde ir e o carro
- * esterça até se alinhar. Só horizontal — a tração vem dos pedais.
+ * Volante analógico: o esterço é proporcional ao quanto o polegar se afasta do
+ * centro. Só horizontal — a tração vem dos pedais.
  */
 function SteeringStick() {
   const base = useRef<HTMLDivElement>(null);

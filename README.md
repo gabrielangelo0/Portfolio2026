@@ -26,7 +26,7 @@ npm run build && npm start
 | Ação | Teclado | Toque |
 | --- | --- | --- |
 | Acelerar / ré | `W` `S` ou ↑ ↓ | pedais **Acelerar** e **Ré**, à direita |
-| Lado da tela | `A` `D` ou ← → | volante analógico, à esquerda |
+| Esterçar | `A` `D` ou ← → | volante analógico, à esquerda |
 | Freio | `Espaço` | — |
 | Voltar à largada | `R` | botão "Reiniciar posição" |
 | Abrir o mapa | `M` | tocar no minimapa |
@@ -36,16 +36,17 @@ apertar `D` significa "vá para a direita da tela" e o carro esterça até se al
 Sem isso, com o carro vindo na direção da câmera os comandos laterais aparecem
 invertidos — o problema clássico de câmera fixa.
 
-A perspectiva entra **só no instante em que a tecla é pressionada**: ali se decide
-para que lado do mundo girar para o carro ir ao lado da tela pedido, e esse sentido
-fica travado enquanto o jogador segura. Daí em diante é volante puro — o algoritmo
-não corrige nada por baixo, então a curva não "gruda" em direção nenhuma e dá para
-dar a volta completa. Soltar e apertar de novo recalcula.
+A direção é **direta**, como em qualquer jogo de corrida: `A` e `D` esterçam o
+volante do carro, e a física espelha o comando em marcha à ré — que é o que um carro
+de verdade faz com as rodas viradas. No celular o volante analógico só esterça; quem
+dá tração é o pedal.
 
-Dando ré é a traseira que aponta para onde o carro vai, então é ela que orienta a
-decisão; e como a física espelha o esterço com velocidade negativa, o comando desfaz
-esse espelhamento para o sentido de giro no mundo continuar o mesmo. No celular o
-volante só escolhe o lado; quem dá tração é o pedal.
+Houve um experimento de **direção relativa à tela** (apertar `D` significaria "vá
+para a direita da tela" mesmo com o carro vindo na direção da câmera, com o sentido
+decidido no toque e travado enquanto a tecla ficasse pressionada). Ele funciona como
+especificado, mas confunde na prática: o comando deixa de corresponder ao volante.
+Ficou guardado em [Car.tsx](components/canvas/Car.tsx) atrás da constante
+`SCREEN_RELATIVE_STEERING` — basta pôr em `true` para reativar.
 
 A lista de seções no canto da tela também é um atalho: clicar em um item leva o carro
 direto até a zona correspondente, para quem não quiser dirigir.
