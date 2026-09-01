@@ -128,6 +128,8 @@ export function Car() {
 
   const zoneCheck = useRef(0);
   const wheelSpin = useRef(0);
+  const stuckFor = useRef(0);
+  const unstickUntil = useRef(0);
 
   useFrame((state, rawDelta) => {
     const rb = body.current;
@@ -164,9 +166,13 @@ export function Car() {
         cameraRight.crossVectors(cameraForward, UP).normalize();
         desired.copy(cameraRight).multiplyScalar(Math.sign(lateral));
 
-        // andando de ré é a traseira que aponta para onde o carro vai
-        const reversing = signedSpeed < -0.4;
-        const heading = reversing
+        // Qual ponta mirar vem da *intenção* (dar ré é a traseira que aponta
+        // para onde o carro vai); a compensação do espelhamento vem da
+        // *velocidade real*. Misturar as duas coisas fazia o esterço inverter
+        // sozinho quando o carro recuava com o acelerador para frente — e o
+        // carro ficava oscilando no lugar em vez de virar.
+        const aimWithRear = throttle < 0;
+        const heading = aimWithRear
           ? Math.atan2(-forward.x, -forward.z)
           : Math.atan2(forward.x, forward.z);
 
@@ -175,13 +181,32 @@ export function Car() {
           THREE.MathUtils.clamp(deviation / FULL_LOCK_ANGLE, -1, 1) *
           Math.min(Math.abs(lateral), 1);
 
-        // a física já espelha o comando quando a velocidade é negativa
-        if (reversing) steer = -steer;
+        // a física espelha o comando com velocidade negativa; desfaz aqui
+        if (signedSpeed < -0.4) steer = -steer;
       }
     }
 
+    // Desencalhe. Prensado contra um obstáculo, girar enfiaria a quina do carro
+    // nele e o solver cancela a rotação: o jogador ficava preso apontando para
+    // a parede e só saía dando ré na mão. Quando ele acelera, pede direção e
+    // mesmo assim não sai do lugar, o carro recua sozinho o suficiente para
+    // descolar e conseguir esterçar.
+    const wantsToTurn = Math.abs(input.moveX) > INPUT_DEAD_ZONE;
+    if (throttle !== 0 && wantsToTurn && Math.abs(signedSpeed) < 0.6) {
+      stuckFor.current += delta;
+      if (stuckFor.current > 0.25) unstickUntil.current = state.clock.elapsedTime + 0.6;
+    } else {
+      stuckFor.current = 0;
+    }
+    const unsticking = state.clock.elapsedTime < unstickUntil.current;
+
     // aceleração / ré
-    if (throttle > 0 && signedSpeed < MAX_SPEED) {
+    if (unsticking) {
+      impulse
+        .copy(forward)
+        .multiplyScalar(-Math.sign(throttle) * ENGINE_FORCE * 0.8 * delta);
+      rb.applyImpulse(impulse, true);
+    } else if (throttle > 0 && signedSpeed < MAX_SPEED) {
       impulse.copy(forward).multiplyScalar(ENGINE_FORCE * throttle * delta);
       rb.applyImpulse(impulse, true);
     } else if (throttle < 0 && signedSpeed > -MAX_REVERSE_SPEED) {
@@ -202,7 +227,13 @@ export function Car() {
     rb.applyImpulse(impulse, true);
 
     // esterço proporcional à velocidade (parado, o volante não gira)
-    const steerAuthority = Math.min(planarSpeed / 4, 1);
+    // Encostado num obstáculo a velocidade cai a ~0 e o esterço morria junto: o
+    // carro ficava preso apontando para a parede e só saía dando ré. Com o
+    // acelerador aplicado o volante mantém um mínimo de autoridade.
+    const steerAuthority = Math.max(
+      Math.min(planarSpeed / 4, 1),
+      unsticking ? 0.9 : throttle !== 0 ? 0.45 : 0,
+    );
     const angular = rb.angvel();
     const targetYaw = steer * TURN_SPEED * steerAuthority * (signedSpeed < -0.4 ? -1 : 1);
     rb.setAngvel(

@@ -164,6 +164,13 @@ coincidir com o ponto em que os pneus tocam o chão.
   preso. A inclinação é visual: quatro raycasts medem a altura do chão à frente,
   atrás e dos dois lados, e o modelo é rotacionado para acompanhar a rampa. No ar,
   sem contato, ele volta suavemente à horizontal.
+- **Sair de um obstáculo**: prensado contra algo, girar enfiaria a quina do carro
+  nele e o solver cancela a rotação — o jogador ficava preso apontando para a
+  parede e só saía dando ré na mão. Quando ele acelera, pede direção e mesmo assim
+  não sai do lugar, o carro recua sozinho o suficiente para descolar e esterçar.
+  Qual ponta mirar vem da *intenção* (`W` mira o nariz, `S` a traseira) e a
+  compensação do espelhamento vem da *velocidade real*: misturar as duas coisas
+  fazia o esterço inverter sozinho durante a manobra, e o carro oscilava no lugar.
 - **Rodas**: os grupos das rodas usam ordem de Euler `YXZ` — o esterço (Y) tem que
   ser aplicado antes do giro do pneu (X), senão a roda cambaleia nas curvas em vez
   de girar no próprio eixo. O ângulo vem do raio real (ω = v / r) e o acumulador
