@@ -39,8 +39,6 @@ const cameraGoal = new THREE.Vector3();
 const CAMERA_OFFSET = new THREE.Vector3(0, 11, 15);
 
 const INPUT_DEAD_ZONE = 0.14;
-/** Desvio a partir do qual o volante já vai todo para um lado. */
-const FULL_LOCK_ANGLE = Math.PI / 4;
 
 const UP = new THREE.Vector3(0, 1, 0);
 const cameraForward = new THREE.Vector3();
@@ -130,6 +128,8 @@ export function Car() {
   const wheelSpin = useRef(0);
   const stuckFor = useRef(0);
   const unstickUntil = useRef(0);
+  const steerSign = useRef(0);
+  const steerHeld = useRef(false);
 
   useFrame((state, rawDelta) => {
     const rb = body.current;
@@ -148,10 +148,12 @@ export function Car() {
     const signedSpeed = goingForward ? planarSpeed : -planarSpeed;
 
     // ---- intenção do jogador ----
-    // Tração é relativa ao carro (W acelera, S dá ré). Só o lado é resolvido no
-    // espaço da câmera: apertar "direita" significa ir para a direita *da tela*,
-    // e o carro esterça até se alinhar. Sem isso, com o carro vindo na direção
-    // da câmera os comandos laterais aparecem invertidos.
+    // Tração é relativa ao carro (W acelera, S dá ré). O lado segue a tela, mas
+    // a perspectiva só entra **no instante em que a tecla é pressionada**: ali
+    // se decide para que lado do mundo girar para o carro ir ao lado da tela
+    // pedido, e esse sentido fica travado enquanto o jogador segura. Daí em
+    // diante é volante puro — o algoritmo não corrige nada por baixo, então a
+    // curva não "gruda" em direção nenhuma e dá para dar a volta completa.
     let throttle = 0;
     let steer = 0;
 
@@ -160,28 +162,28 @@ export function Car() {
       throttle = pedal !== 0 ? pedal : input.moveY;
 
       const lateral = input.moveX;
-      if (Math.abs(lateral) > INPUT_DEAD_ZONE) {
+      const holding = Math.abs(lateral) > INPUT_DEAD_ZONE;
+
+      if (holding && !steerHeld.current) {
         camera.getWorldDirection(cameraForward);
         cameraForward.setY(0).normalize();
         cameraRight.crossVectors(cameraForward, UP).normalize();
         desired.copy(cameraRight).multiplyScalar(Math.sign(lateral));
 
-        // Qual ponta mirar vem da *intenção* (dar ré é a traseira que aponta
-        // para onde o carro vai); a compensação do espelhamento vem da
-        // *velocidade real*. Misturar as duas coisas fazia o esterço inverter
-        // sozinho quando o carro recuava com o acelerador para frente — e o
-        // carro ficava oscilando no lugar em vez de virar.
-        const aimWithRear = throttle < 0;
-        const heading = aimWithRear
-          ? Math.atan2(-forward.x, -forward.z)
-          : Math.atan2(forward.x, forward.z);
-
+        // dando ré é a traseira que aponta para onde o carro vai
+        const heading =
+          throttle < 0
+            ? Math.atan2(-forward.x, -forward.z)
+            : Math.atan2(forward.x, forward.z);
         const deviation = wrapAngle(Math.atan2(desired.x, desired.z) - heading);
-        steer =
-          THREE.MathUtils.clamp(deviation / FULL_LOCK_ANGLE, -1, 1) *
-          Math.min(Math.abs(lateral), 1);
+        steerSign.current = deviation >= 0 ? 1 : -1;
+      }
+      steerHeld.current = holding;
 
-        // a física espelha o comando com velocidade negativa; desfaz aqui
+      if (holding) {
+        steer = steerSign.current * Math.min(Math.abs(lateral), 1);
+        // a física espelha o comando com velocidade negativa; desfaz aqui para
+        // o sentido de giro no mundo continuar sendo o mesmo
         if (signedSpeed < -0.4) steer = -steer;
       }
     }

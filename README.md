@@ -36,10 +36,15 @@ apertar `D` significa "vá para a direita da tela" e o carro esterça até se al
 Sem isso, com o carro vindo na direção da câmera os comandos laterais aparecem
 invertidos — o problema clássico de câmera fixa.
 
-Na prática: `A`/`D` viram um rumo no espaço da câmera, e a diferença entre esse rumo
-e o do carro define o esterço, saturando a partir de 45° de desvio. Andando de ré é
-a traseira que aponta para onde o carro vai, então o cálculo usa ela — e o comando
-espelha, porque a física já inverte o esterço com velocidade negativa. No celular o
+A perspectiva entra **só no instante em que a tecla é pressionada**: ali se decide
+para que lado do mundo girar para o carro ir ao lado da tela pedido, e esse sentido
+fica travado enquanto o jogador segura. Daí em diante é volante puro — o algoritmo
+não corrige nada por baixo, então a curva não "gruda" em direção nenhuma e dá para
+dar a volta completa. Soltar e apertar de novo recalcula.
+
+Dando ré é a traseira que aponta para onde o carro vai, então é ela que orienta a
+decisão; e como a física espelha o esterço com velocidade negativa, o comando desfaz
+esse espelhamento para o sentido de giro no mundo continuar o mesmo. No celular o
 volante só escolhe o lado; quem dá tração é o pedal.
 
 A lista de seções no canto da tela também é um atalho: clicar em um item leva o carro
