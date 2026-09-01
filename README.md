@@ -50,6 +50,26 @@ volante só escolhe o lado; quem dá tração é o pedal.
 A lista de seções no canto da tela também é um atalho: clicar em um item leva o carro
 direto até a zona correspondente, para quem não quiser dirigir.
 
+## O cenário
+
+Um vale verde cercado de serra, com floresta, vilarejo e lago — tudo gerado por
+código, sem nenhum asset:
+
+- **serra** em três anéis de cones, cada um mais claro e azulado que o anterior;
+  os picos do fundo ganham neve. As alturas são contidas de propósito: com picos
+  altos demais a serra come o céu inteiro no enquadramento do jogo;
+- **floresta** com pinheiros, folhosas, arbustos e pedras, em `InstancedMesh` (uma
+  chamada de desenho por tipo, não por árvore) e verdes sorteados para a mata não
+  ficar chapada. A densidade cresce com o cubo da distância ao centro: fecha nas
+  beiradas e rareia no miolo, senão o carro passa o tempo todo desviando;
+- **vilarejo** de casas com telhado de duas águas, chaminé e janelas acesas;
+- **céu** com gradiente próprio num domo. O `<Sky>` do drei cobria a cena inteira
+  de branco neste enquadramento, então o shader é escrito à mão — e ainda combina
+  melhor com a névoa.
+
+O chão de colisão continua plano: o relevo fica todo fora da cerca, o que dá a
+paisagem sem quebrar a física já calibrada do carro.
+
 ## Mapa
 
 Minimapa no estilo GTA: o carro fica fixo no centro apontando para cima e o mundo

@@ -6,6 +6,8 @@ import { projects } from "@/lib/data";
 import {
   ARENA,
   CRATE_STACKS,
+  HOUSES,
+  LAKE,
   RAMPS,
   START_PAD,
   ZONE_RADIUS,
@@ -38,7 +40,7 @@ export function Minimap({ onExpand }: { onExpand: () => void }) {
       ctx.arc(half, half, half - 1, 0, Math.PI * 2);
       ctx.clip();
 
-      ctx.fillStyle = "#13101f";
+      ctx.fillStyle = "#4a7636";
       ctx.fillRect(0, 0, SIZE, SIZE);
 
       ctx.translate(half, half);
@@ -51,18 +53,18 @@ export function Minimap({ onExpand }: { onExpand: () => void }) {
       const world = (x: number, z: number): [number, number] => [x * scale, z * scale];
 
       // fora dos limites
-      ctx.fillStyle = "#0a0812";
+      ctx.fillStyle = "#3c6a35";
       ctx.fillRect(-ARENA * scale - 400, -ARENA * scale - 400, 800 + ARENA * 2 * scale, 400);
       ctx.fillRect(-ARENA * scale - 400, ARENA * scale, 800 + ARENA * 2 * scale, 400);
       ctx.fillRect(-ARENA * scale - 400, -ARENA * scale, 400, ARENA * 2 * scale);
       ctx.fillRect(ARENA * scale, -ARENA * scale, 400, ARENA * 2 * scale);
 
-      ctx.strokeStyle = "#4c3f8a";
+      ctx.strokeStyle = "#c2a878";
       ctx.lineWidth = 2;
       ctx.strokeRect(-ARENA * scale, -ARENA * scale, ARENA * 2 * scale, ARENA * 2 * scale);
 
       // grade
-      ctx.strokeStyle = "rgba(120, 104, 190, 0.14)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.09)";
       ctx.lineWidth = 1;
       for (let i = -ARENA; i <= ARENA; i += 10) {
         ctx.beginPath();
@@ -74,13 +76,13 @@ export function Minimap({ onExpand }: { onExpand: () => void }) {
       }
 
       // largada
-      ctx.fillStyle = "rgba(120, 108, 200, 0.28)";
+      ctx.fillStyle = "rgba(169, 133, 90, 0.85)";
       ctx.beginPath();
       ctx.arc(...world(START_PAD.x, START_PAD.z), START_PAD.radius * scale, 0, Math.PI * 2);
       ctx.fill();
 
       // rampas
-      ctx.fillStyle = "rgba(122, 110, 200, 0.55)";
+      ctx.fillStyle = "rgba(169, 133, 90, 0.7)";
       for (const ramp of RAMPS) {
         ctx.save();
         ctx.translate(...world(ramp.position[0], ramp.position[2]));
@@ -95,19 +97,32 @@ export function Minimap({ onExpand }: { onExpand: () => void }) {
       }
 
       // caixas
-      ctx.fillStyle = "#c98a3c";
+      ctx.fillStyle = "#c08b4e";
       for (const [x, , z] of CRATE_STACKS) {
         const [px, pz] = world(x, z);
         ctx.fillRect(px - 4, pz - 4, 8, 8);
       }
 
-      // árvores e pedras, só como pontinhos de referência
+      // mata e pedras, como pontinhos de referência
+      const SCENERY_COLOR: Record<string, string> = {
+        pine: "rgba(44, 92, 55, 0.95)",
+        broadleaf: "rgba(75, 140, 60, 0.95)",
+        bush: "rgba(90, 150, 70, 0.8)",
+        rock: "rgba(140, 138, 132, 0.9)",
+      };
       for (const item of scenery) {
         const [px, pz] = world(item.position[0], item.position[2]);
-        ctx.fillStyle = item.kind === "tree" ? "rgba(224, 93, 134, 0.75)" : "rgba(84, 76, 120, 0.9)";
+        ctx.fillStyle = SCENERY_COLOR[item.kind];
         ctx.beginPath();
-        ctx.arc(px, pz, item.kind === "tree" ? 2.6 : 2, 0, Math.PI * 2);
+        ctx.arc(px, pz, item.kind === "bush" || item.kind === "rock" ? 1.8 : 2.6, 0, Math.PI * 2);
         ctx.fill();
+      }
+
+      // casario
+      ctx.fillStyle = "#c9b79a";
+      for (const house of HOUSES) {
+        const [px, pz] = world(house.position[0], house.position[2]);
+        ctx.fillRect(px - 3, pz - 3, 6, 6);
       }
 
       // zonas

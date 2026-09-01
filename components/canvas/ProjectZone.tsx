@@ -56,8 +56,8 @@ export function ProjectZone({ project }: { project: Project }) {
       <RigidBody type="fixed" colliders="cuboid">
         {[-3.1, 3.1].map((x) => (
           <mesh key={x} position={[x, 1.1, -2.6]} castShadow>
-            <boxGeometry args={[0.4, 2.2, 0.4]} />
-            <meshStandardMaterial color="#2a2740" roughness={0.8} />
+            <boxGeometry args={[0.34, 2.2, 0.34]} />
+            <meshStandardMaterial color="#7a5a3c" roughness={0.95} />
           </mesh>
         ))}
       </RigidBody>

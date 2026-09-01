@@ -36,7 +36,9 @@ const impulse = new THREE.Vector3();
 const carPosition = new THREE.Vector3();
 const cameraTarget = new THREE.Vector3();
 const cameraGoal = new THREE.Vector3();
-const CAMERA_OFFSET = new THREE.Vector3(0, 11, 15);
+// Mais deitada que uma câmera isométrica pura: é o que deixa a serra e o céu
+// entrarem no enquadramento em vez de só o gramado.
+const CAMERA_OFFSET = new THREE.Vector3(0, 8, 18);
 
 const INPUT_DEAD_ZONE = 0.14;
 
@@ -312,9 +314,11 @@ export function Car() {
     // Na vertical, mira um pouco abaixo do carro: ele sobe na tela e o painel
     // de conteúdo deixa de cobri-lo.
     cameraTarget.lerp(carPosition, 1 - Math.pow(0.002, delta));
+    // mira acima do carro: sem isso o horizonte fica fora do quadro e a serra
+    // ao redor do vale nunca aparece
     camera.lookAt(
       cameraTarget.x,
-      cameraTarget.y - (zoomOut - 1) * 11,
+      cameraTarget.y + 3.2 - (zoomOut - 1) * 11,
       cameraTarget.z,
     );
 
