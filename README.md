@@ -47,6 +47,39 @@ flip it to `true` to bring it back.
 The section list in the corner is also a shortcut: clicking an entry drives the car
 straight to that zone, for visitors who would rather not drive.
 
+## The career track
+
+The dirt track that leaves the start pad is the story: it winds through the valley past
+six dated gates — 2012 Java, 2015 PHP, 2020 HTML/CSS/JS, 2021 first developer job, 2024
+startup partner, 2025 teaching at Digital College — and then climbs the hillside to a
+chequered finish line, where crossing it sets off confetti and a fanfare.
+
+The route lives in [lib/career.ts](lib/career.ts) as a Catmull-Rom spline in plain
+JavaScript, with no three.js import, because three different places need it and none of
+them may disagree: the ribbon drawn in the world, the line on the minimap, and the rule
+that keeps procedural scenery from growing on the track. `Finish line` in the section
+list drives you to the last stretch.
+
+The shape — half an ellipse around the valley, then the run west — was picked against
+two hard constraints: it starts under the spawn point (the car begins *on* the track,
+pointing along it), and no radius of curvature may be smaller than half the ribbon's
+width, or the ribbon folds over itself in the bend. An earlier route failed both: the
+car started six metres off the track, and the exit from the start pad had a 1.9 m radius
+that creased the road.
+
+Three things the track forced:
+
+- **the ribbon sits 15 cm above the ground.** It is built from the exact height
+  function, while the visible terrain is a mesh that interpolates linearly between
+  vertices — on curved stretches that mesh rose *in front of* the ribbon and the track
+  disappeared into the hillside. The grid went to 96 subdivisions and the lift covers
+  what is left;
+- **a parking brake.** The car's collider has no friction, so on any slope it slid back
+  down on its own, and stopping at the finish to read it meant rolling away. Below
+  `PARK_SPEED`, with no throttle and the car settled on the ground, lateral drift is
+  zeroed. A plateau carved into the terrain was tried first and was worse: it raised a
+  2.5 m step across the hillside that the car simply crashed into.
+
 ## The scenery
 
 A green valley ringed by mountains, with forest, a hamlet and a lake — all generated in

@@ -4,9 +4,9 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import {
   CoefficientCombineRule,
-  CuboidCollider,
   RapierRigidBody,
   RigidBody,
+  RoundCuboidCollider,
   useRapier,
 } from "@react-three/rapier";
 import * as THREE from "three";
@@ -14,7 +14,9 @@ import { CarModel, WHEEL_RADIUS } from "./CarModel";
 import { input, bindKeyboard } from "@/lib/controls";
 import { audio } from "@/lib/audio";
 import { carState } from "@/lib/carState";
+import { START_HEADING, trackPointAt } from "@/lib/career";
 import { projects } from "@/lib/data";
+import { terrainHeight } from "@/lib/terrain";
 import { useGameStore } from "@/store/useGameStore";
 
 const ENGINE_FORCE = 34;
@@ -31,6 +33,8 @@ const BRAKE = 3.2;
  */
 const HILL_HOLD = 9;
 const HILL_HOLD_MAX_SPEED = 4;
+/** Abaixo desta velocidade e sem acelerador, o carro fica onde parou. */
+const PARK_SPEED = 1.8;
 const ZONE_RADIUS = 4.2;
 const SPAWN: [number, number, number] = [0, 1.2, 6];
 
@@ -111,7 +115,10 @@ export function Car() {
     rb.setTranslation({ x: SPAWN[0], y: SPAWN[1], z: SPAWN[2] }, true);
     rb.setLinvel({ x: 0, y: 0, z: 0 }, true);
     rb.setAngvel({ x: 0, y: 0, z: 0 }, true);
-    rb.setRotation({ x: 0, y: 0, z: 0, w: 1 }, true);
+    rb.setRotation(
+      { x: 0, y: Math.sin(START_HEADING / 2), z: 0, w: Math.cos(START_HEADING / 2) },
+      true,
+    );
   };
 
   useEffect(() => {
@@ -123,16 +130,34 @@ export function Car() {
   useEffect(() => {
     const rb = body.current;
     if (!rb || !teleport) return;
-    const target = projects.find((p) => p.id === teleport.id);
-    if (!target) return;
 
-    const [tx, , tz] = target.position;
-    const distance = Math.hypot(tx, tz) || 1;
-    const x = tx + (tx / distance) * 3;
-    const z = tz + (tz / distance) * 3;
-    const yaw = Math.atan2(tx - x, tz - z);
+    let x: number;
+    let z: number;
+    let yaw: number;
 
-    rb.setTranslation({ x, y: 1.2, z }, true);
+    if (teleport.id === "finish") {
+      // Larga o carro um pouco antes da linha e apontado para ela: quem pede a
+      // chegada quer cruzá-la, não olhar para ela parado do lado.
+      const approach = trackPointAt(0.93);
+      x = approach.x;
+      z = approach.z;
+      yaw = Math.atan2(approach.dx, approach.dz);
+    } else {
+      const target = projects.find((p) => p.id === teleport.id);
+      if (!target) return;
+
+      const [tx, , tz] = target.position;
+      const distance = Math.hypot(tx, tz) || 1;
+      x = tx + (tx / distance) * 3;
+      z = tz + (tz / distance) * 3;
+      yaw = Math.atan2(tx - x, tz - z);
+    }
+
+    // A altura vem do relevo — com y fixo o carro cairia de 4 metros na encosta
+    // — e a folga é curta de propósito: caindo de mais alto ele bate na rampa
+    // com velocidade suficiente para escapar da trava de estacionamento e sair
+    // ladeira abaixo sozinho.
+    rb.setTranslation({ x, y: terrainHeight(x, z) + 0.6, z }, true);
     rb.setLinvel({ x: 0, y: 0, z: 0 }, true);
     rb.setAngvel({ x: 0, y: 0, z: 0 }, true);
     rb.setRotation(
@@ -250,6 +275,15 @@ export function Car() {
     if (throttle === 0 && !input.brake && planarSpeed < HILL_HOLD_MAX_SPEED) {
       impulse.copy(velocity).multiplyScalar(-HILL_HOLD * delta);
       rb.applyImpulse(impulse, true);
+    }
+
+    // Trava de estacionamento. O arrasto acima freia, mas não segura: numa
+    // ladeira o collider sem atrito desce sozinho para sempre, e quem parou no
+    // alto da serra para ler a chegada voltava ladeira abaixo. Sem acelerador,
+    // quase parado e com o carro apoiado no chão, a deriva horizontal morre.
+    const settling = Math.abs(linvel.y) < 2;
+    if (throttle === 0 && !input.brake && planarSpeed < PARK_SPEED && settling) {
+      rb.setLinvel({ x: 0, y: linvel.y, z: 0 }, true);
     }
 
     // freio de mão
@@ -384,6 +418,9 @@ export function Car() {
       ref={body}
       colliders={false}
       position={SPAWN}
+      // nasce apontado ao longo da pista: largar de lado deixava o jogador de
+      // cara para a grama, sem saber por onde a história começa
+      rotation={[0, START_HEADING, 0]}
       mass={1}
       linearDamping={0.55}
       angularDamping={4}
@@ -399,9 +436,13 @@ export function Car() {
       ccd
     >
       {/* Sem atrito de contato: a aderência é simulada no useFrame (modelo arcade).
-          Com o atrito do Rapier o chão freava o carro antes do motor vencer. */}
-      <CuboidCollider
-        args={[0.6, 0.5, 1.45]}
+          Com o atrito do Rapier o chão freava o carro antes do motor vencer.
+
+          Quinas arredondadas de propósito: sobre o terreno em malha, um cuboide
+          de quinas vivas engancha nas arestas entre triângulos — batidas em
+          pontos invisíveis — e chega a atravessar o chão. */}
+      <RoundCuboidCollider
+        args={[0.54, 0.44, 1.39, 0.06]}
         position={[0, 0.5, 0]}
         friction={0}
         frictionCombineRule={CoefficientCombineRule.Min}

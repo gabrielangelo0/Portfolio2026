@@ -199,6 +199,46 @@ class GameAudio {
     });
   }
 
+  /** Fanfarra da linha de chegada. */
+  finish() {
+    const ctx = this.ctx;
+    if (!ctx || !this.buses || !this.noise) return;
+
+    const now = ctx.currentTime;
+    // acorde maior subindo: dó, mi, sol, dó — a resolução que o ouvido espera
+    [523.25, 659.25, 783.99, 1046.5].forEach((frequency, index) => {
+      [0, 1].forEach((voice) => {
+        const osc = ctx.createOscillator();
+        osc.type = voice ? "triangle" : "square";
+        osc.frequency.value = frequency * (voice ? 2 : 1);
+
+        const gain = ctx.createGain();
+        const at = now + index * 0.11;
+        const peak = voice ? 0.07 : 0.16;
+        gain.gain.setValueAtTime(0, at);
+        gain.gain.linearRampToValueAtTime(peak, at + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.001, at + 1.5);
+
+        osc.connect(gain).connect(this.buses!.sfx);
+        osc.start(at);
+        osc.stop(at + 1.6);
+      });
+    });
+
+    // chiado curto do confete estourando
+    const noise = ctx.createBufferSource();
+    noise.buffer = this.noise;
+    const band = ctx.createBiquadFilter();
+    band.type = "bandpass";
+    band.frequency.value = 3200;
+    const shh = ctx.createGain();
+    shh.gain.setValueAtTime(0.3, now);
+    shh.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    noise.connect(band).connect(shh).connect(this.buses.sfx);
+    noise.start(now);
+    noise.stop(now + 0.5);
+  }
+
   // ---------- construção ----------
 
   private createNoiseBuffer(ctx: AudioContext) {

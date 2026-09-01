@@ -3,6 +3,7 @@
  * minimapa desenha exatamente os mesmos objetos — duplicar as posições faria o
  * mapa mentir assim que o cenário mudasse.
  */
+import { distanceToTrack, trackPointAt, TRACK_WIDTH } from "./career";
 import { projects } from "./data";
 
 export const ARENA = 46; // meia-largura do vale jogável
@@ -11,14 +12,18 @@ export const ZONE_RADIUS = 4.2;
 
 export type Ramp = { position: [number, number, number]; rotation: number; size: [number, number] };
 
+/**
+ * Rampas e caixas ficam fora da pista da trajetória — antes elas caíam em cima
+ * do traçado, e o percurso é o fio da história: ninguém deve tropeçar nele.
+ */
 export const RAMPS: Ramp[] = [
-  { position: [-14, 0, -6], rotation: 0.6, size: [6, 7] },
-  { position: [12, 0, 4], rotation: -2.2, size: [6, 7] },
+  { position: [-14, 0, 2], rotation: 0.6, size: [6, 7] },
+  { position: [-15, 0, 12], rotation: -2.2, size: [6, 7] },
 ];
 
 export const CRATE_STACKS: [number, number, number][] = [
-  [8, 0, -16],
-  [-16, 0, 14],
+  [0, 0, 27],
+  [12, 0, -25],
 ];
 
 /** PRNG determinístico: mesma cena no servidor, no cliente e no mapa. */
@@ -32,9 +37,16 @@ export function mulberry32(seed: number) {
   };
 }
 
+const FINISH_POINT = trackPointAt(1);
+
 /** Espaço ocupado que nada mais pode invadir (largada, zonas, rampas, vila). */
 function isBlocked(x: number, z: number, margin: number, extra: [number, number, number][] = []) {
   if (Math.hypot(x - START_PAD.x, z - START_PAD.z) < START_PAD.radius + margin) return true;
+  // a pista da trajetória tem que ficar limpa de ponta a ponta
+  if (distanceToTrack(x, z) < TRACK_WIDTH / 2 + 1.5 + margin) return true;
+  // e a chegada ganha uma clareira: a mata fecha justo na borda do vale, e o
+  // pórtico da linha ficava atrás de duas árvores
+  if (Math.hypot(x - FINISH_POINT.x, z - FINISH_POINT.z) < 10 + margin) return true;
   if (projects.some((p) => Math.hypot(x - p.position[0], z - p.position[2]) < 8 + margin)) {
     return true;
   }

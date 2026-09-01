@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { carState } from "@/lib/carState";
+import { TRACK, TRACK_WIDTH, trackPointAt } from "@/lib/career";
 import { projects } from "@/lib/data";
 import {
   ARENA,
@@ -74,6 +75,28 @@ export function Minimap({ onExpand }: { onExpand: () => void }) {
         ctx.lineTo(ARENA * scale, i * scale);
         ctx.stroke();
       }
+
+      // pista da trajetória, desenhada antes de tudo o que fica em cima dela
+      ctx.strokeStyle = "rgba(169, 133, 90, 0.9)";
+      ctx.lineWidth = TRACK_WIDTH * scale;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      TRACK.forEach((point, i) => {
+        const [px, pz] = world(point.x, point.z);
+        if (i === 0) ctx.moveTo(px, pz);
+        else ctx.lineTo(px, pz);
+      });
+      ctx.stroke();
+
+      // linha de chegada
+      const finish = trackPointAt(1);
+      ctx.save();
+      ctx.translate(...world(finish.x, finish.z));
+      ctx.rotate(-Math.atan2(finish.dx, finish.dz));
+      ctx.fillStyle = "#f6f3ee";
+      ctx.fillRect((-TRACK_WIDTH / 2) * scale, -2, TRACK_WIDTH * scale, 4);
+      ctx.restore();
 
       // largada
       ctx.fillStyle = "rgba(169, 133, 90, 0.85)";

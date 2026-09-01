@@ -141,6 +141,29 @@ kbd {
   font-size: 0.82rem;
 }
 
+.intro__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 18px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--border);
+  list-style: none;
+  font-size: 0.85rem;
+}
+
+.intro__links a {
+  color: rgba(244, 240, 255, 0.82);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.intro__links a:hover {
+  color: #fff;
+  border-bottom-color: currentColor;
+}
+
 /* ---------- HUD ---------- */
 .hud {
   position: absolute;
@@ -270,6 +293,22 @@ kbd {
   box-shadow: 0 0 12px currentColor;
 }
 
+/* atalho para a chegada: quadriculado em vez de bolinha colorida */
+.compass__flag {
+  border-radius: 1px;
+  opacity: 1;
+  background:
+    linear-gradient(45deg, #15121f 25%, transparent 25%, transparent 75%, #15121f 75%),
+    linear-gradient(45deg, #15121f 25%, #f6f3ee 25%, #f6f3ee 75%, #15121f 75%);
+  background-size: 5px 5px;
+  background-position: 0 0, 2.5px 2.5px;
+}
+
+.compass li button.is-finish {
+  color: rgba(246, 243, 238, 0.9);
+  font-weight: 600;
+}
+
 .compass__note {
   display: block;
   margin-top: 10px;
@@ -355,6 +394,13 @@ kbd {
   text-decoration: underline;
 }
 
+/* o painel de contato lista e-mail e perfis lado a lado */
+.panel__contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
 /* ---------- Rótulos 3D (drei Html) ---------- */
 .zone-label {
   display: flex;
@@ -387,6 +433,56 @@ kbd {
   color: var(--zone);
   font-size: 10px;
   letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- Marcos da pista da trajetória ---------- */
+.milestone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 230px;
+  padding: 9px 13px;
+  border: 1px solid var(--accent, #ffd24a);
+  border-radius: 12px;
+  background: rgba(18, 15, 31, 0.82);
+  color: #fff;
+  text-align: center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.milestone__year {
+  color: var(--accent, #ffd24a);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.milestone__title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.milestone__detail {
+  color: rgba(226, 220, 245, 0.78);
+  font-size: 10.5px;
+  line-height: 1.45;
+}
+
+/* a chegada usa o xadrez da bandeira em vez de uma cor de marco */
+.milestone.is-finish {
+  --accent: #f6f3ee;
+  width: 250px;
+  border-width: 2px;
+  box-shadow: 0 0 34px rgba(246, 243, 238, 0.35);
+}
+
+.milestone.is-finish .milestone__year {
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -677,6 +773,9 @@ kbd {
   }
 
   .compass li button {
+    /* flex: 0 0 auto para os chips não encolherem: a barra rola na horizontal
+       em vez de espremer os nomes das seções. */
+    flex: 0 0 auto;
     width: auto;
     margin: 0;
     padding: 6px 10px;
@@ -684,6 +783,10 @@ kbd {
     border-radius: 999px;
     white-space: nowrap;
     font-size: 0.76rem;
+  }
+
+  .compass li {
+    flex: 0 0 auto;
   }
 
   .panel {

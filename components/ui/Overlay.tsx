@@ -53,6 +53,19 @@ function Intro() {
             <kbd>M</kbd> map
           </li>
         </ul>
+
+        <ul className="intro__links">
+          {profile.links.map((link) => (
+            <li key={link.label}>
+              <a href={link.url} target="_blank" rel="noreferrer">
+                {link.label}
+              </a>
+            </li>
+          ))}
+          <li>
+            <a href={`mailto:${profile.email}`}>Email</a>
+          </li>
+        </ul>
       </div>
     </div>
   );
@@ -104,13 +117,26 @@ function ProjectPanel() {
               <li key={tech}>{tech}</li>
             ))}
           </ul>
-          {project.id === "contato" ? (
-            <a className="panel__link" href={`mailto:${profile.email}`}>
-              {profile.email}
-            </a>
+          {project.id === "contact" ? (
+            <div className="panel__contact">
+              <a className="panel__link" href={`mailto:${profile.email}`}>
+                {profile.email}
+              </a>
+              {profile.links.map((link) => (
+                <a
+                  key={link.label}
+                  className="panel__link"
+                  href={link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {link.label} →
+                </a>
+              ))}
+            </div>
           ) : project.url ? (
             <a className="panel__link" href={project.url} target="_blank" rel="noreferrer">
-              Ver mais →
+              View more →
             </a>
           ) : null}
         </div>
@@ -141,6 +167,16 @@ function Compass() {
             </button>
           </li>
         ))}
+        <li>
+          <button
+            className="is-finish"
+            onClick={() => goToZone("finish")}
+            title="Jump to the finish line"
+          >
+            <i className="compass__flag" />
+            Finish line
+          </button>
+        </li>
       </ul>
       <span className="compass__note">click to jump</span>
     </nav>

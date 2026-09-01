@@ -17,6 +17,7 @@ import {
   generateScenery,
 } from "@/lib/world";
 import { RESOLUTION, RISE_HEIGHT, terrainHeight } from "@/lib/terrain";
+import { CareerTrack } from "./CareerTrack";
 import { ProjectZone } from "./ProjectZone";
 
 const GRASS = "#5b8c42";
@@ -331,20 +332,21 @@ function Ground() {
         <meshStandardMaterial color={GRASS} roughness={1} flatShading />
       </mesh>
 
-      {/* campo que continua além da cerca até o pé da serra */}
+      {/* Campo que continua além da cerca até o pé da serra. Começa por baixo
+          da borda do vale (que é quadrada) para não abrir fenda nos lados. */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[0, RISE_HEIGHT - 0.6, 0]}
+        position={[0, RISE_HEIGHT - 0.06, 0]}
         receiveShadow
       >
-        <ringGeometry args={[ARENA * 1.02, ARENA * 4.5, 64]} />
+        <ringGeometry args={[ARENA * 0.99, ARENA * 4.5, 64]} />
         <meshStandardMaterial color={GRASS_DARK} roughness={1} />
       </mesh>
 
       {/* lago no sopé da serra */}
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[LAKE.x, RISE_HEIGHT - 0.55, LAKE.z]}
+        position={[LAKE.x, RISE_HEIGHT - 0.02, LAKE.z]}
       >
         <circleGeometry args={[LAKE.radius, 48]} />
         <meshStandardMaterial color="#3f7f9c" roughness={0.15} metalness={0.5} />
@@ -418,6 +420,7 @@ export function World() {
       <Fence />
       <Mountains />
       <Forest />
+      <CareerTrack />
 
       {HOUSES.map((house, i) => (
         <Cottage key={i} house={house} />
