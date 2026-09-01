@@ -191,21 +191,43 @@ export const START_HEADING = (() => {
   return Math.atan2(start.dx, start.dz);
 })();
 
-/** Distância de um ponto qualquer ao eixo da pista. */
+/** Comprimento do maior segmento amostrado, para o corte rápido abaixo. */
+const LONGEST_SEGMENT = TRACK.reduce(
+  (longest, sample, i) =>
+    i === 0 ? longest : Math.max(longest, sample.distance - TRACK[i - 1].distance),
+  0,
+);
+
+/**
+ * Distância de um ponto qualquer ao eixo da pista. É chamada dezenas de milhares
+ * de vezes ao semear o cenário, então o laço descarta o segmento por uma
+ * comparação de quadrados antes de fazer a projeção.
+ */
 export function distanceToTrack(x: number, z: number) {
   let best = Infinity;
+  let cutoff = Infinity;
 
   for (let i = 1; i < TRACK.length; i++) {
     const a = TRACK[i - 1];
+    const ax = x - a.x;
+    const az = z - a.z;
+    const toStart = ax * ax + az * az;
+    if (toStart > cutoff) continue;
+
     const b = TRACK[i];
     const dx = b.x - a.x;
     const dz = b.z - a.z;
     const lengthSq = dx * dx + dz * dz || 1;
 
     // projeção do ponto no segmento, presa entre as duas pontas
-    const t = Math.min(Math.max(((x - a.x) * dx + (z - a.z) * dz) / lengthSq, 0), 1);
+    const t = Math.min(Math.max((ax * dx + az * dz) / lengthSq, 0), 1);
     const distance = Math.hypot(x - (a.x + dx * t), z - (a.z + dz * t));
-    if (distance < best) best = distance;
+    if (distance < best) {
+      best = distance;
+      // nenhum segmento cuja ponta esteja além disto pode melhorar o resultado
+      const reach = best + LONGEST_SEGMENT;
+      cutoff = reach * reach;
+    }
   }
 
   return best;

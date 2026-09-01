@@ -80,6 +80,25 @@ Three things the track forced:
   zeroed. A plateau carved into the terrain was tried first and was worse: it raised a
   2.5 m step across the hillside that the car simply crashed into.
 
+## Hidden things
+
+Six objects are scattered around the hillside — a rubber duck, a ladybug, a giant coffee
+cup, a 404 road sign, a hovering UFO and a 3½" floppy. Driving within seven metres of one
+counts as finding it: a note slides in, the tally in the corner goes up, and the spot is
+marked on the minimap. What you have found is kept in `localStorage`, so the hunt
+survives a reload. There is a seventh thing, and it is not on the map — try the Konami
+code.
+
+They also do the scenery a favour. The valley is laid out by sector, and before this the
+south and south-west had almost nothing in them while both ramps sat side by side in the
+west. Ramps, crates and village clusters were redistributed one per sector — positions
+chosen by a search for the largest clearance from the track, the sections and the start
+pad — and the secrets fill the outer ring, which until then was only trees.
+
+That crowding had a cost worth knowing about: with the track, the finish clearing and the
+secrets all claiming space, the house generator went from thirteen cottages to four,
+because it gave up on the first collision. It now tries several spots per house.
+
 ## The scenery
 
 A green valley ringed by mountains, with forest, a hamlet and a lake — all generated in

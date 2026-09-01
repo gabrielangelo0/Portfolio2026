@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { carState } from "@/lib/carState";
 import { TRACK, TRACK_WIDTH, trackPointAt } from "@/lib/career";
 import { projects } from "@/lib/data";
+import { SECRETS } from "@/lib/secrets";
 import {
   ARENA,
   CRATE_STACKS,
@@ -27,6 +28,7 @@ const SIZE = 170; // lado do canvas, em CSS pixels
 export function Minimap({ onExpand }: { onExpand: () => void }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const scenery = useMemo(() => generateScenery(), []);
+  const found = useGameStore((s) => s.foundSecrets);
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D) => {
@@ -148,6 +150,17 @@ export function Minimap({ onExpand }: { onExpand: () => void }) {
         ctx.fillRect(px - 3, pz - 3, 6, 6);
       }
 
+      // Segredos, só os que este visitante já achou: marcar os outros entregaria
+      // a caçada, e não marcar os achados obriga a decorar onde ficavam.
+      for (const secret of SECRETS) {
+        if (!found.includes(secret.id)) continue;
+        const [px, pz] = world(secret.position[0], secret.position[1]);
+        ctx.fillStyle = "#ffd24a";
+        ctx.beginPath();
+        ctx.arc(px, pz, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       // zonas
       for (const project of projects) {
         const [px, pz] = world(project.position[0], project.position[2]);
@@ -198,7 +211,7 @@ export function Minimap({ onExpand }: { onExpand: () => void }) {
       ctx.stroke();
       ctx.restore();
     },
-    [scenery],
+    [scenery, found],
   );
 
   useEffect(() => {

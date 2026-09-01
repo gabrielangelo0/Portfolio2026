@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { audio } from "@/lib/audio";
+import { carState } from "@/lib/carState";
+import { terrainHeight } from "@/lib/terrain";
 import { profile, projects } from "@/lib/data";
+import { SECRETS } from "@/lib/secrets";
 import { useGameStore } from "@/store/useGameStore";
 import { Minimap, WorldMap } from "./Minimap";
 import { TouchControls } from "./TouchControls";
@@ -30,7 +33,9 @@ function Intro() {
         <h1 className="intro__name">{profile.name}</h1>
         <p className="intro__role">{profile.role}</p>
         <p className="intro__tagline">{profile.tagline}</p>
-        <p className="intro__sound">Sound on — you can mute it anytime.</p>
+        <p className="intro__sound">
+          Sound on — you can mute it anytime. Six things are hidden out in the hills.
+        </p>
 
         <button className="intro__button" onClick={enter} autoFocus>
           Get in the car
@@ -183,10 +188,114 @@ function Compass() {
   );
 }
 
+/**
+ * Placar da caçada. Só aparece depois do primeiro achado: quem não sabe que há
+ * segredos não precisa ver um contador zerado estragando a surpresa.
+ */
+function SecretTally() {
+  const found = useGameStore((s) => s.foundSecrets);
+  if (found.length === 0) return null;
+
+  return (
+    <div className={`tally ${found.length === SECRETS.length ? "is-complete" : ""}`}>
+      <span className="tally__count">
+        {found.length}/{SECRETS.length}
+      </span>
+      <span className="tally__label">
+        {found.length === SECRETS.length ? "all secrets found" : "secrets found"}
+      </span>
+    </div>
+  );
+}
+
+/** Aviso passageiro: segredo achado, código secreto digitado. */
+function Toast() {
+  const notice = useGameStore((s) => s.notice);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!notice) return;
+    setVisible(true);
+    const timer = window.setTimeout(() => setVisible(false), 5200);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  if (!notice) return null;
+
+  return (
+    <div className={`toast ${visible ? "is-open" : ""}`}>
+      <span className="toast__eyebrow">{notice.eyebrow}</span>
+      <strong className="toast__title">{notice.title}</strong>
+      <span className="toast__message">{notice.message}</span>
+    </div>
+  );
+}
+
+/**
+ * O código do Konami. As setas também dirigem, mas a sequência inteira é longa
+ * demais para sair por acidente ao volante.
+ */
+const KONAMI = [
+  "ArrowUp",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowLeft",
+  "ArrowRight",
+  "KeyB",
+  "KeyA",
+];
+
+function useKonami(onUnlock: () => void) {
+  const progress = useRef(0);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.code === KONAMI[progress.current]) {
+        progress.current += 1;
+        if (progress.current === KONAMI.length) {
+          progress.current = 0;
+          onUnlock();
+        }
+        return;
+      }
+      // recomeça — mas uma tecla certa fora de hora já vale como novo começo
+      progress.current = event.code === KONAMI[0] ? 1 : 0;
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onUnlock]);
+}
+
 export function Overlay() {
   const started = useGameStore((s) => s.started);
   const muted = useGameStore((s) => s.muted);
+  const hydrateSecrets = useGameStore((s) => s.hydrateSecrets);
   const [mapOpen, setMapOpen] = useState(false);
+
+  // o que este visitante já achou vive no navegador dele, e só pode ser lido
+  // depois da hidratação
+  useEffect(() => hydrateSecrets(), [hydrateSecrets]);
+
+  const onKonami = useCallback(() => {
+    const { celebrate, notify } = useGameStore.getState();
+    celebrate(carState.x, terrainHeight(carState.x, carState.z) + 4, carState.z);
+    notify({
+      eyebrow: "↑ ↑ ↓ ↓ ← → ← → B A",
+      title: "Konami code",
+      message: "Thirty lives not included. The confetti is on the house.",
+    });
+    try {
+      audio.finish();
+    } catch {
+      // sem som, a festa é só visual
+    }
+  }, []);
+
+  useKonami(onKonami);
 
   useEffect(() => {
     audio.setMuted(muted);
@@ -225,6 +334,8 @@ export function Overlay() {
       <Hud />
       <Compass />
       <ProjectPanel />
+      <SecretTally />
+      <Toast />
       <Minimap onExpand={() => setMapOpen(true)} />
       {mapOpen && <WorldMap onClose={() => setMapOpen(false)} />}
       <TouchControls />

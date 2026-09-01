@@ -19,6 +19,7 @@ import {
 import { RESOLUTION, RISE_HEIGHT, terrainHeight } from "@/lib/terrain";
 import { CareerTrack } from "./CareerTrack";
 import { ProjectZone } from "./ProjectZone";
+import { Secrets } from "./Secrets";
 
 const GRASS = "#5b8c42";
 const GRASS_DARK = "#55833e";
@@ -421,6 +422,7 @@ export function World() {
       <Mountains />
       <Forest />
       <CareerTrack />
+      <Secrets />
 
       {HOUSES.map((house, i) => (
         <Cottage key={i} house={house} />

@@ -6,6 +6,7 @@ import { Physics } from "@react-three/rapier";
 import { AdaptiveDpr, Environment, Lightformer, Preload } from "@react-three/drei";
 import * as THREE from "three";
 import { Car } from "./Car";
+import { Confetti } from "./Confetti";
 import { World } from "./World";
 
 /**
@@ -145,6 +146,8 @@ export default function Experience() {
           <World />
           <Car />
         </Physics>
+        {/* fora do mundo físico: papel picado não colide com nada */}
+        <Confetti />
         <Preload all />
       </Suspense>
 

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { loadSecrets, saveSecrets, SECRETS, type SecretKind } from "@/lib/secrets";
 
 type GameState = {
   started: boolean;
@@ -16,6 +17,16 @@ type GameState = {
   goToZone: (id: string) => void;
   muted: boolean;
   toggleMuted: () => void;
+  /** Segredos já encontrados. */
+  foundSecrets: SecretKind[];
+  findSecret: (id: SecretKind) => void;
+  hydrateSecrets: () => void;
+  /** Aviso passageiro no canto — segredo achado, código secreto digitado. */
+  notice: { eyebrow: string; title: string; message: string; nonce: number } | null;
+  notify: (notice: { eyebrow: string; title: string; message: string }) => void;
+  /** Pedido de confete em um ponto do mundo; o emissor é um só. */
+  celebration: { x: number; y: number; z: number; nonce: number } | null;
+  celebrate: (x: number, y: number, z: number) => void;
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -37,4 +48,33 @@ export const useGameStore = create<GameState>((set) => ({
       started: true,
       teleport: { id, nonce: (s.teleport?.nonce ?? 0) + 1 },
     })),
+  foundSecrets: [],
+  findSecret: (id) =>
+    set((s) => {
+      if (s.foundSecrets.includes(id)) return s;
+      const foundSecrets = [...s.foundSecrets, id];
+      saveSecrets(foundSecrets);
+      const secret = SECRETS.find((item) => item.id === id);
+      return {
+        foundSecrets,
+        notice: secret
+          ? {
+              eyebrow: "Secret found",
+              title: secret.title,
+              message: secret.message,
+              nonce: (s.notice?.nonce ?? 0) + 1,
+            }
+          : s.notice,
+      };
+    }),
+  notice: null,
+  notify: (notice) =>
+    set((s) => ({ notice: { ...notice, nonce: (s.notice?.nonce ?? 0) + 1 } })),
+  celebration: null,
+  celebrate: (x, y, z) =>
+    set((s) => ({ celebration: { x, y, z, nonce: (s.celebration?.nonce ?? 0) + 1 } })),
+  // O estado nasce vazio e só depois lê o localStorage: fazer isso na criação
+  // do store quebraria a hidratação, já que o servidor não tem como saber o que
+  // este visitante já achou.
+  hydrateSecrets: () => set({ foundSecrets: loadSecrets() }),
 }));

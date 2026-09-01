@@ -486,6 +486,82 @@ kbd {
   text-transform: uppercase;
 }
 
+/* ---------- Caçada aos segredos ---------- */
+.tally {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  z-index: 20;
+  pointer-events: none;
+}
+
+.tally.is-complete {
+  border-color: #ffd24a;
+  box-shadow: 0 0 24px rgba(255, 210, 74, 0.35);
+}
+
+.tally__count {
+  color: #ffd24a;
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tally__label {
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.toast {
+  position: absolute;
+  top: 74px;
+  right: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 280px;
+  padding: 14px 16px;
+  border: 1px solid #ffd24a;
+  border-radius: 14px;
+  background: var(--panel);
+  z-index: 21;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.toast.is-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast__eyebrow {
+  color: #ffd24a;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.toast__title {
+  font-size: 1.05rem;
+}
+
+.toast__message {
+  color: rgba(226, 220, 245, 0.78);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
 /* ---------- Minimapa ---------- */
 .minimap {
   position: absolute;
@@ -787,6 +863,21 @@ kbd {
 
   .compass li {
     flex: 0 0 auto;
+  }
+
+  .tally {
+    top: auto;
+    bottom: 96px;
+    right: 10px;
+    padding: 6px 11px;
+  }
+
+  .toast {
+    top: auto;
+    bottom: 140px;
+    right: 10px;
+    left: 10px;
+    width: auto;
   }
 
   .panel {

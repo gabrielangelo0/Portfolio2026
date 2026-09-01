@@ -5,6 +5,7 @@
  */
 import { distanceToTrack, trackPointAt, TRACK_WIDTH } from "./career";
 import { projects } from "./data";
+import { SECRETS } from "./secrets";
 
 export const ARENA = 46; // meia-largura do vale jogável
 export const START_PAD = { x: 0, z: 6, radius: 7 };
@@ -13,19 +14,23 @@ export const ZONE_RADIUS = 4.2;
 export type Ramp = { position: [number, number, number]; rotation: number; size: [number, number] };
 
 /**
- * Rampas e caixas ficam fora da pista da trajetória — antes elas caíam em cima
- * do traçado, e o percurso é o fio da história: ninguém deve tropeçar nele.
+ * Rampas e caixas ficam fora da pista da trajetória — o percurso é o fio da
+ * história, ninguém deve tropeçar nele — e uma em cada setor do vale. Antes as
+ * duas rampas estavam encostadas uma na outra a oeste e metade do mapa não
+ * tinha nada; as posições saíram de uma busca pela maior folga até a pista, as
+ * seções e a largada, setor a setor.
  */
 export const RAMPS: Ramp[] = [
-  { position: [-14, 0, 2], rotation: 0.6, size: [6, 7] },
-  { position: [-15, 0, 12], rotation: -2.2, size: [6, 7] },
+  { position: [25.5, 0, -5], rotation: 1.77, size: [6, 7] },
+  { position: [-14.5, 0, 11.5], rotation: -0.9, size: [6, 7] },
+  { position: [-11, 0, -24.5], rotation: -2.72, size: [6, 7] },
 ];
 
 export const CRATE_STACKS: [number, number, number][] = [
-  [0, 0, 27],
-  [12, 0, -25],
+  [0, 0, 20.5],
+  [15.5, 0, 12],
+  [11, 0, -24.5],
 ];
-
 /** PRNG determinístico: mesma cena no servidor, no cliente e no mapa. */
 export function mulberry32(seed: number) {
   return function random() {
@@ -47,6 +52,11 @@ function isBlocked(x: number, z: number, margin: number, extra: [number, number,
   // e a chegada ganha uma clareira: a mata fecha justo na borda do vale, e o
   // pórtico da linha ficava atrás de duas árvores
   if (Math.hypot(x - FINISH_POINT.x, z - FINISH_POINT.z) < 10 + margin) return true;
+  // cada segredo também: escondido é uma coisa, invisível dentro de um pinheiro
+  // é outra
+  if (SECRETS.some(({ position: [sx, sz] }) => Math.hypot(x - sx, z - sz) < 8 + margin)) {
+    return true;
+  }
   if (projects.some((p) => Math.hypot(x - p.position[0], z - p.position[2]) < 8 + margin)) {
     return true;
   }
@@ -73,16 +83,25 @@ const ROOFS = ["#a4483c", "#8c4436", "#b35a43", "#7d5140"];
 /** Casario espalhado em dois núcleos, longe das zonas e da pista. */
 export const HOUSES: House[] = (() => {
   const random = mulberry32(77123);
+  // cinco núcleos ao redor do vale: com três, metade do horizonte ficava sem
+  // nenhuma construção
   const clusters: [number, number][] = [
     [-30, -26],
     [30, 26],
     [-33, 22],
+    [38, -12],
+    [10, 38],
   ];
   const houses: House[] = [];
 
   for (const [cx, cz] of clusters) {
-    const count = 4 + Math.floor(random() * 2);
-    for (let i = 0; i < count; i++) {
+    const target = 3 + Math.floor(random() * 2);
+    let placed = 0;
+
+    // Tenta várias posições por casa em vez de desistir na primeira colisão: o
+    // vale ficou cheio (pista, chegada, segredos) e, com uma tentativa só, o
+    // casario caía de treze casas para quatro.
+    for (let attempt = 0; attempt < 40 && placed < target; attempt++) {
       const angle = random() * Math.PI * 2;
       const distance = 3 + random() * 8;
       const x = cx + Math.cos(angle) * distance;
@@ -90,6 +109,7 @@ export const HOUSES: House[] = (() => {
       if (isBlocked(x, z, 2)) continue;
       if (houses.some((h) => Math.hypot(x - h.position[0], z - h.position[2]) < 6)) continue;
 
+      placed++;
       houses.push({
         position: [x, 0, z],
         rotation: random() * Math.PI * 2,
@@ -121,7 +141,7 @@ export function generateScenery(): SceneryItem[] {
   const houseSpots = HOUSES.map((h) => h.position);
 
   let guard = 0;
-  while (items.length < 190 && guard < 6000) {
+  while (items.length < 190 && guard < 30000) {
     guard++;
     const x = (random() - 0.5) * ARENA * 1.96;
     const z = (random() - 0.5) * ARENA * 1.96;
@@ -132,7 +152,7 @@ export function generateScenery(): SceneryItem[] {
     if (random() > 0.02 + Math.pow(edge, 3) * 2.2) continue;
 
     if (isBlocked(x, z, 3, houseSpots)) continue;
-    if (items.some((it) => Math.hypot(x - it.position[0], z - it.position[2]) < 3.2)) continue;
+    if (items.some((it) => Math.hypot(x - it.position[0], z - it.position[2]) < 2.8)) continue;
 
     const roll = random();
     const kind: SceneryItem["kind"] =

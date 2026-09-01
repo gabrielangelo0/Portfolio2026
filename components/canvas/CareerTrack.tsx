@@ -14,6 +14,7 @@ import {
   trackPointAt,
 } from "@/lib/career";
 import { terrainHeight } from "@/lib/terrain";
+import { useGameStore } from "@/store/useGameStore";
 
 const POST = "#6c4a2e";
 
@@ -173,49 +174,6 @@ function MilestoneGate({
   );
 }
 
-const CONFETTI_COUNT = 260;
-const CONFETTI_COLORS = [
-  "#ff6b4a",
-  "#4ac8ff",
-  "#b04aff",
-  "#ffd24a",
-  "#4affa1",
-  "#ff4a8d",
-  "#ffffff",
-];
-
-/**
- * Retângulo de papel com uma cor por instância. A cor entra como atributo
- * instanciado da própria geometria em vez de `setColorAt`: o `instanceColor` só
- * chega ao shader se o material recompilar depois de existir, e nesse intervalo
- * os confetes saíam pretos.
- */
-function useConfettiGeometry() {
-  return useMemo(() => {
-    const geometry = new THREE.PlaneGeometry(0.16, 0.26);
-    const colors = new Float32Array(CONFETTI_COUNT * 3);
-    const color = new THREE.Color();
-
-    for (let i = 0; i < CONFETTI_COUNT; i++) {
-      color.set(CONFETTI_COLORS[i % CONFETTI_COLORS.length]);
-      colors[i * 3] = color.r;
-      colors[i * 3 + 1] = color.g;
-      colors[i * 3 + 2] = color.b;
-    }
-
-    geometry.setAttribute("color", new THREE.InstancedBufferAttribute(colors, 3));
-    return geometry;
-  }, []);
-}
-
-type Confetto = {
-  position: THREE.Vector3;
-  velocity: THREE.Vector3;
-  spin: THREE.Vector3;
-  rotation: THREE.Euler;
-  life: number;
-};
-
 /**
  * Linha de chegada no alto da serra. Os confetes disparam quando o carro cruza
  * e se rearmam depois que ele se afasta — assim dá para voltar e comemorar de
@@ -259,143 +217,57 @@ function FinishLine() {
     return texture;
   }, [checker]);
 
-  const confettiGeometry = useConfettiGeometry();
-  const confettiRef = useRef<THREE.InstancedMesh>(null);
-  const confetti = useRef<Confetto[]>(
-    Array.from({ length: CONFETTI_COUNT }, () => ({
-      position: new THREE.Vector3(),
-      velocity: new THREE.Vector3(),
-      spin: new THREE.Vector3(),
-      rotation: new THREE.Euler(),
-      life: 0,
-    })),
-  );
   const armed = useRef(true);
-  const celebrating = useRef(0);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-
+  const celebrate = useGameStore((state) => state.celebrate);
 
   const half = TRACK_WIDTH / 2 + 1;
 
-  const burst = () => {
-    for (const piece of confetti.current) {
-      const spread = (Math.random() - 0.5) * TRACK_WIDTH * 1.6;
-      piece.position.set(
-        gate.x + Math.cos(gate.rotation) * spread,
-        gate.y + 4.6 + Math.random() * 0.8,
-        gate.z - Math.sin(gate.rotation) * spread,
-      );
-      piece.velocity.set(
-        (Math.random() - 0.5) * 5.5,
-        1.5 + Math.random() * 5.5,
-        (Math.random() - 0.5) * 5.5,
-      );
-      piece.spin.set(
-        (Math.random() - 0.5) * 12,
-        (Math.random() - 0.5) * 12,
-        (Math.random() - 0.5) * 12,
-      );
-      piece.rotation.set(Math.random() * 6.28, Math.random() * 6.28, Math.random() * 6.28);
-      piece.life = 3.4 + Math.random() * 1.8;
-    }
-    celebrating.current = 5.2;
-    try {
-      audio.finish();
-    } catch {
-      // som é bônus, a festa continua sem ele
-    }
-  };
-
-  useFrame((_, rawDelta) => {
-    const delta = Math.min(rawDelta, 1 / 20);
+  useFrame(() => {
     const distance = Math.hypot(carState.x - gate.x, carState.z - gate.z);
 
+    // rearma quando o carro se afasta: dá para voltar e comemorar de novo, que
+    // é o que qualquer um faz
     if (armed.current && distance < half + 1.5) {
       armed.current = false;
-      burst();
+      celebrate(gate.x, gate.y + 4.6, gate.z);
+      try {
+        audio.finish();
+      } catch {
+        // som é bônus, a festa continua sem ele
+      }
     } else if (!armed.current && distance > 16) {
       armed.current = true;
     }
-
-    const mesh = confettiRef.current;
-    if (!mesh) return;
-
-    if (celebrating.current <= 0) {
-      if (mesh.visible) mesh.visible = false;
-      return;
-    }
-
-    mesh.visible = true;
-    celebrating.current -= delta;
-
-    confetti.current.forEach((piece, index) => {
-      if (piece.life > 0) {
-        piece.life -= delta;
-        piece.velocity.y -= 11 * delta;
-        // arrasto: papel não cai como pedra, ele planeia
-        piece.velocity.multiplyScalar(1 - 1.1 * delta);
-        piece.position.addScaledVector(piece.velocity, delta);
-        piece.rotation.x += piece.spin.x * delta;
-        piece.rotation.y += piece.spin.y * delta;
-        piece.rotation.z += piece.spin.z * delta;
-
-        const floor = terrainHeight(piece.position.x, piece.position.z) + 0.05;
-        if (piece.position.y < floor) {
-          piece.position.y = floor;
-          piece.velocity.set(0, 0, 0);
-          piece.spin.set(0, 0, 0);
-        }
-      }
-
-      dummy.position.copy(piece.position);
-      dummy.rotation.copy(piece.rotation);
-      dummy.scale.setScalar(piece.life > 0 ? 1 : 0);
-      dummy.updateMatrix();
-      mesh.setMatrixAt(index, dummy.matrix);
-    });
-
-    mesh.instanceMatrix.needsUpdate = true;
   });
 
   return (
-    <group>
-      <group position={[gate.x, gate.y, gate.z]} rotation={[0, gate.rotation, 0]}>
-        {[-half, half].map((x) => (
-          <mesh key={x} position={[x, 2.2, 0]} castShadow>
-            <boxGeometry args={[0.3, 4.4, 0.3]} />
-            <meshStandardMaterial color={POST} roughness={0.95} />
-          </mesh>
-        ))}
-
-        {/* faixa quadriculada em cima do pórtico */}
-        <mesh position={[0, 4.6, 0]} castShadow>
-          <boxGeometry args={[half * 2 + 0.3, 1, 0.14]} />
-          <meshStandardMaterial map={checker} roughness={0.8} />
+    <group position={[gate.x, gate.y, gate.z]} rotation={[0, gate.rotation, 0]}>
+      {[-half, half].map((x) => (
+        <mesh key={x} position={[x, 2.2, 0]} castShadow>
+          <boxGeometry args={[0.3, 4.4, 0.3]} />
+          <meshStandardMaterial color={POST} roughness={0.95} />
         </mesh>
+      ))}
 
-        {/* e pintada no chão, atravessando a pista */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
-          <planeGeometry args={[TRACK_WIDTH, 1.6]} />
-          <meshStandardMaterial map={floorChecker} roughness={1} />
-        </mesh>
+      {/* faixa quadriculada em cima do pórtico */}
+      <mesh position={[0, 4.6, 0]} castShadow>
+        <boxGeometry args={[half * 2 + 0.3, 1, 0.14]} />
+        <meshStandardMaterial map={checker} roughness={0.8} />
+      </mesh>
 
-        <Html position={[0, 6, 0]} center distanceFactor={11} zIndexRange={[18, 0]}>
-          <div className="milestone is-finish">
-            <span className="milestone__year">{FINISH.year}</span>
-            <span className="milestone__title">{FINISH.title}</span>
-            <span className="milestone__detail">{FINISH.detail}</span>
-          </div>
-        </Html>
-      </group>
+      {/* e pintada no chão, atravessando a pista */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]}>
+        <planeGeometry args={[TRACK_WIDTH, 1.6]} />
+        <meshStandardMaterial map={floorChecker} roughness={1} />
+      </mesh>
 
-      <instancedMesh
-        ref={confettiRef}
-        args={[confettiGeometry, undefined, CONFETTI_COUNT]}
-        visible={false}
-        frustumCulled={false}
-      >
-        <meshStandardMaterial vertexColors side={THREE.DoubleSide} roughness={0.55} />
-      </instancedMesh>
+      <Html position={[0, 6, 0]} center distanceFactor={11} zIndexRange={[18, 0]}>
+        <div className="milestone is-finish">
+          <span className="milestone__year">{FINISH.year}</span>
+          <span className="milestone__title">{FINISH.title}</span>
+          <span className="milestone__detail">{FINISH.detail}</span>
+        </div>
+      </Html>
     </group>
   );
 }
