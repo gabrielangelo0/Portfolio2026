@@ -1,0 +1,487 @@
+:root {
+  --bg: #120f1f;
+  --ink: #f4f0ff;
+  --muted: #a79dc8;
+  --accent: #ff6b4a;
+  --panel: rgba(24, 20, 40, 0.82);
+  --border: rgba(160, 140, 255, 0.22);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  overscroll-behavior: none;
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.15em 0.45em;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  font-family: inherit;
+  font-size: 0.78em;
+  line-height: 1.4;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+}
+
+.stage canvas {
+  display: block;
+  touch-action: none;
+}
+
+.boot {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+
+/* ---------- Intro ---------- */
+.intro {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at 50% 40%, rgba(30, 22, 55, 0.55), rgba(10, 8, 18, 0.92));
+  backdrop-filter: blur(6px);
+  z-index: 30;
+}
+
+.intro__card {
+  width: min(520px, 100%);
+  padding: 36px 34px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  text-align: left;
+}
+
+.intro__eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.intro__name {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 2.9rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.intro__role {
+  margin: 6px 0 18px;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.intro__tagline {
+  margin: 0 0 26px;
+  color: rgba(244, 240, 255, 0.85);
+  line-height: 1.55;
+}
+
+.intro__button {
+  width: 100%;
+  padding: 15px 20px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ff6b4a, #ff3d80);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 30px rgba(255, 61, 128, 0.28);
+}
+
+.intro__button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(255, 61, 128, 0.38);
+}
+
+.intro__keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+/* ---------- HUD ---------- */
+.hud {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  z-index: 20;
+}
+
+.hud__speed {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 10px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud__value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.hud__unit {
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hud__reset {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(24, 20, 40, 0.6);
+  color: var(--muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.hud__reset:hover {
+  color: var(--ink);
+}
+
+/* ---------- Bússola / lista de zonas ---------- */
+.compass {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--panel);
+  z-index: 20;
+  max-width: 220px;
+}
+
+.compass__hint {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.compass ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85rem;
+}
+
+.compass li button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 3px 6px;
+  margin: 0 -6px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.compass li button:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.compass li button.is-active {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.compass i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  opacity: 0.55;
+  flex: none;
+}
+
+.compass li button.is-active i {
+  opacity: 1;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.compass__note {
+  display: block;
+  margin-top: 10px;
+  color: rgba(167, 157, 200, 0.6);
+  font-size: 0.68rem;
+}
+
+/* ---------- Painel do projeto ---------- */
+.panel {
+  position: absolute;
+  right: 22px;
+  top: 22px;
+  width: min(360px, calc(100vw - 44px));
+  z-index: 25;
+  opacity: 0;
+  transform: translateX(24px);
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.panel.is-open {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.panel__inner {
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--zone);
+  border-radius: 16px;
+  background: var(--panel);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.panel__subtitle {
+  margin: 0 0 4px;
+  color: var(--zone);
+  font-size: 0.74rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.panel__title {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.panel__description {
+  margin: 0 0 16px;
+  color: rgba(244, 240, 255, 0.8);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.panel__stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.panel__stack li {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.panel__link {
+  color: var(--zone);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.panel__link:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Rótulos 3D (drei Html) ---------- */
+.zone-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 16px;
+  border: 1px solid var(--zone);
+  border-radius: 10px;
+  background: rgba(18, 15, 31, 0.75);
+  color: #fff;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.zone-label.is-active {
+  transform: scale(1.08);
+  box-shadow: 0 0 26px var(--zone);
+}
+
+.zone-label__title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.zone-label__subtitle {
+  color: var(--zone);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- Controles de toque ---------- */
+.touch {
+  position: absolute;
+  left: 20px;
+  bottom: 24px;
+  display: grid;
+  grid-template-areas:
+    ". up ."
+    "left down right";
+  gap: 8px;
+  z-index: 20;
+}
+
+.touch__btn {
+  width: 58px;
+  height: 58px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(24, 20, 40, 0.75);
+  color: var(--ink);
+  font-size: 1.1rem;
+  touch-action: none;
+  user-select: none;
+}
+
+.touch__btn:active {
+  background: rgba(255, 107, 74, 0.35);
+}
+
+.touch__up { grid-area: up; }
+.touch__down { grid-area: down; }
+.touch__left { grid-area: left; }
+.touch__right { grid-area: right; }
+
+@media (max-width: 640px) {
+  /* Em telas estreitas a lista vira uma barra de chips no topo. */
+  .compass {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    max-width: none;
+    padding: 8px 10px;
+  }
+
+  .compass__hint,
+  .compass__note {
+    display: none;
+  }
+
+  .compass ul {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .compass ul::-webkit-scrollbar {
+    display: none;
+  }
+
+  .compass li button {
+    width: auto;
+    margin: 0;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    white-space: nowrap;
+    font-size: 0.76rem;
+  }
+
+  .panel {
+    top: auto;
+    bottom: 190px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+
+  .panel__inner {
+    padding: 16px 18px;
+  }
+
+  .panel__description {
+    font-size: 0.85rem;
+  }
+
+  .hud {
+    right: 10px;
+    bottom: 14px;
+  }
+
+  .hud__speed {
+    padding: 6px 12px;
+  }
+
+  .hud__value {
+    font-size: 1.3rem;
+  }
+
+  .touch__btn {
+    width: 52px;
+    height: 52px;
+  }
+}

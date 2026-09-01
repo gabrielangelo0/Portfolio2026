@@ -1,0 +1,121 @@
+# Portfólio 3D dirigível
+
+Portfólio interativo inspirado em [bruno-simon.com](https://bruno-simon.com/): você dirige um
+carro low-poly por uma cena 3D e cada área do mundo abre uma seção do portfólio.
+
+Feito com **Next.js (App Router) + React Three Fiber + Rapier**, sem nenhum asset externo —
+todo o cenário é montado com geometrias primitivas, então o carregamento é instantâneo.
+
+## Rodando
+
+```bash
+npm install
+npm run dev
+```
+
+Abra http://localhost:3000.
+
+Build de produção:
+
+```bash
+npm run build && npm start
+```
+
+## Controles
+
+| Ação | Teclado | Toque |
+| --- | --- | --- |
+| Acelerar / ré | `W` `S` ou ↑ ↓ | botões ▲ ▼ |
+| Esterçar | `A` `D` ou ← → | botões ◀ ▶ |
+| Freio | `Espaço` | — |
+| Voltar à largada | `R` | botão "Reiniciar posição" |
+
+A lista de seções no canto da tela também é um atalho: clicar em um item leva o carro
+direto até a zona correspondente, para quem não quiser dirigir.
+
+## Estrutura
+
+```
+app/                 layout, página e estilos globais
+components/
+  Scene.tsx          junta o Canvas (client-only) com a UI em HTML
+  canvas/
+    Experience.tsx   Canvas, luzes, névoa e o mundo físico
+    Car.tsx          física arcade do carro, câmera e detecção de zonas
+    CarModel.tsx     carroceria low-poly (hatch compacto) modelada por código
+    World.tsx        chão, muros, rampas, caixas e cenário procedural
+    ProjectZone.tsx  plataforma, feixe de luz e rótulo de cada seção
+  ui/                intro, HUD, painel de conteúdo e controles de toque
+app/inspect/         oficina do modelo do carro (ver abaixo)
+lib/data.ts          SEU CONTEÚDO: perfil e seções do portfólio
+lib/controls.ts      estado de input compartilhado (fora do React, por performance)
+store/               estado da aplicação (zustand)
+```
+
+## Personalizando
+
+Todo o conteúdo vive em [`lib/data.ts`](lib/data.ts): nome, cargo, e-mail e a lista de
+seções. Cada seção tem `position: [x, 0, z]` — é onde o círculo colorido nasce no mundo.
+As zonas ficam num anel em volta da largada (`0, 0`), então vale manter os pontos
+espalhados e a pelo menos 8 unidades uns dos outros; o cenário procedural evita
+automaticamente essas áreas.
+
+## O carro
+
+O carro é um hatch compacto modelado a partir de fotos de referência, inteiramente
+por código — nenhum arquivo `.glb`. A silhueta lateral é uma `THREE.Shape` extrudada,
+com as caixas de roda recortadas no próprio contorno. Uma extrusão pura, porém, vira
+um tubo: `shapeBody()` afina a largura no teto, nas saias e nas pontas, abaula capô e
+teto em direção às bordas e deixa frente e traseira convexas em planta.
+
+A **frente** é montada com peças próprias, todas desenhadas em coordenadas absolutas
+de largura e altura e passadas por `curveToNose()`, que as leva até o para-choque e as
+curva com ele — é isso que impede faróis e grade de boiarem à frente da lataria:
+
+- faróis em bumerangue (as duas lentes numa `ExtrudeGeometry` só), com DRL, projetor,
+  refletor e seta âmbar por dentro;
+- grade inferior trapezoidal (estreita em cima, alargando até a base) com colmeia
+  desenhada em `<canvas>` — os hexágonos em geometria custariam centenas de meshes.
+  A textura é tileável e usa `RepeatWrapping`: a UV da `ExtrudeGeometry` é a própria
+  coordenada do mundo, então metade da grade tem `u` negativo e, com o clamp padrão,
+  a textura "parte" no meio;
+- ponte preta com emblema oval, filetes cromados, asas do para-choque e lâmina inferior;
+- dois vincos no capô convergindo para o emblema.
+
+Os vidros são uma segunda extrusão, levemente maior que a lataria para aflorarem nas
+laterais e não serem cobertos no para-brisa e no vidro traseiro.
+
+Escala: 1 unidade ≈ 1,43 m (comprimento 2,9 = 4,15 m).
+
+Para mexer no modelo, use a oficina em **`/inspect`**, que mostra o carro isolado,
+em fundo claro e com órbita livre:
+
+```
+/inspect?view=lateral            # frente, traseira, lateral, 3-4, 3-4-tras, topo, roda
+/inspect?view=roda&steer=1&spin=0.8   # confere esterço e giro do pneu parados
+```
+
+`steer` vai de -1 a 1 (positivo = curva à direita do carro, mesma convenção do
+jogo) e `spin` é o giro do pneu em radianos. Serve para checar o eixo de rotação
+das rodas sem depender da física.
+
+Trocar de carro é editar `components/canvas/CarModel.tsx`. Se ao mudar as dimensões
+o carro passar a flutuar ou afundar, ajuste o `CuboidCollider` em
+[Car.tsx](components/canvas/Car.tsx): a base dele (`position.y - args[1]`) precisa
+coincidir com o ponto em que os pneus tocam o chão.
+
+## Notas de implementação
+
+- **Física arcade**: o collider do carro tem atrito zero (`frictionCombineRule: Min`) e
+  toda a aderência é simulada no `useFrame` — motor, grip lateral e esterço proporcional à
+  velocidade. Com o atrito de Coulomb do Rapier o chão freava o carro antes do motor vencer.
+- **Sem tunneling**: `timeStep` fixo em 1/60, CCD ligado no carro e chão com 10 unidades de
+  espessura — em um frame longo (aba em segundo plano) o carro não atravessa o mundo.
+- **Rodas**: os grupos das rodas usam ordem de Euler `YXZ` — o esterço (Y) tem que
+  ser aplicado antes do giro do pneu (X), senão a roda cambaleia nas curvas em vez
+  de girar no próprio eixo. O ângulo vem do raio real (ω = v / r) e o acumulador
+  fica em [0, 2π) para não perder precisão com o tempo.
+- **Cena determinística**: as árvores e pedras usam um PRNG com semente fixa, então
+  servidor e cliente geram o mesmo cenário.
+- **Câmera responsiva**: em telas verticais ela se afasta e mira abaixo do carro, para o
+  painel de conteúdo não cobrir a ação.
