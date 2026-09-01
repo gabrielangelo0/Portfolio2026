@@ -39,9 +39,6 @@ const cameraGoal = new THREE.Vector3();
 const CAMERA_OFFSET = new THREE.Vector3(0, 11, 15);
 
 const INPUT_DEAD_ZONE = 0.14;
-/** Além deste desvio o alvo está atrás: em baixa velocidade compensa dar ré. */
-const REVERSE_ANGLE = 2.3;
-const REVERSE_MAX_SPEED = 4;
 /** Desvio a partir do qual o volante já vai todo para um lado. */
 const FULL_LOCK_ANGLE = Math.PI / 4;
 
@@ -148,56 +145,38 @@ export function Car() {
     const goingForward = velocity.dot(forward) >= 0;
     const signedSpeed = goingForward ? planarSpeed : -planarSpeed;
 
-    // ---- intenção do jogador, resolvida no espaço da câmera ----
-    // O vetor de input aponta para onde ir *na tela*; o carro esterça até se
-    // alinhar. É o que evita que "direita" vire esquerda quando ele vem na
-    // direção da câmera.
+    // ---- intenção do jogador ----
+    // Tração é relativa ao carro (W acelera, S dá ré). Só o lado é resolvido no
+    // espaço da câmera: apertar "direita" significa ir para a direita *da tela*,
+    // e o carro esterça até se alinhar. Sem isso, com o carro vindo na direção
+    // da câmera os comandos laterais aparecem invertidos.
     let throttle = 0;
     let steer = 0;
 
     if (started) {
       const pedal = input.throttle - input.reverse;
-      const aim = Math.min(Math.hypot(input.moveX, input.moveY), 1);
+      throttle = pedal !== 0 ? pedal : input.moveY;
 
-      if (aim > INPUT_DEAD_ZONE) {
+      const lateral = input.moveX;
+      if (Math.abs(lateral) > INPUT_DEAD_ZONE) {
         camera.getWorldDirection(cameraForward);
         cameraForward.setY(0).normalize();
         cameraRight.crossVectors(cameraForward, UP).normalize();
+        desired.copy(cameraRight).multiplyScalar(Math.sign(lateral));
 
-        desired
-          .copy(cameraForward)
-          .multiplyScalar(input.moveY)
-          .addScaledVector(cameraRight, input.moveX)
-          .setY(0)
-          .normalize();
+        // andando de ré é a traseira que aponta para onde o carro vai
+        const reversing = signedSpeed < -0.4;
+        const heading = reversing
+          ? Math.atan2(-forward.x, -forward.z)
+          : Math.atan2(forward.x, forward.z);
 
-        const deviation = wrapAngle(
-          Math.atan2(desired.x, desired.z) - Math.atan2(forward.x, forward.z),
-        );
+        const deviation = wrapAngle(Math.atan2(desired.x, desired.z) - heading);
+        steer =
+          THREE.MathUtils.clamp(deviation / FULL_LOCK_ANGLE, -1, 1) *
+          Math.min(Math.abs(lateral), 1);
 
-        // com o alvo atrás e o carro devagar, manobrar de ré é mais natural
-        // que descrever a volta inteira
-        const shouldReverse =
-          pedal === 0 &&
-          Math.abs(deviation) > REVERSE_ANGLE &&
-          Math.abs(signedSpeed) < REVERSE_MAX_SPEED;
-
-        if (shouldReverse) {
-          // alinha a traseira com o destino; o esterço inverte porque a física
-          // já espelha o comando quando a velocidade é negativa
-          const rearDeviation = wrapAngle(deviation - Math.PI);
-          steer = -THREE.MathUtils.clamp(rearDeviation / FULL_LOCK_ANGLE, -1, 1);
-          throttle = -aim;
-        } else {
-          steer = THREE.MathUtils.clamp(deviation / FULL_LOCK_ANGLE, -1, 1);
-          throttle = aim;
-        }
-      }
-
-      // no toque quem manda na tração é o pedal; o volante só aponta a direção
-      if (pedal !== 0) {
-        throttle = pedal;
-        if (pedal < 0) steer = -steer;
+        // a física já espelha o comando quando a velocidade é negativa
+        if (reversing) steer = -steer;
       }
     }
 

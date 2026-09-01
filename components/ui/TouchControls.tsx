@@ -17,28 +17,21 @@ function capturePointer(element: Element, pointerId: number) {
 const KNOB_TRAVEL = 0.62; // fração do raio que o polegar percorre
 
 /**
- * Direcional analógico de 360°: o polegar aponta para onde ir **na tela** e o
- * carro esterça até se alinhar, como nos jogos de câmera livre. Só apontar não
- * move — a tração vem dos pedais.
+ * Volante analógico: o polegar escolhe o lado **da tela** para onde ir e o carro
+ * esterça até se alinhar. Só horizontal — a tração vem dos pedais.
  */
 function SteeringStick() {
   const base = useRef<HTMLDivElement>(null);
   const knob = useRef<HTMLDivElement>(null);
   const activePointer = useRef<number | null>(null);
 
-  const applyDirection = useCallback((x: number, y: number) => {
-    const length = Math.hypot(x, y);
-    const clamped = length > 1 ? 1 / length : 1;
-    const dx = length < DEAD_ZONE ? 0 : x * clamped;
-    const dy = length < DEAD_ZONE ? 0 : y * clamped;
-
-    input.moveX = dx;
-    input.moveY = -dy; // no canvas o Y cresce para baixo; na tela, para cima
+  const applyDirection = useCallback((x: number) => {
+    const value = Math.abs(x) < DEAD_ZONE ? 0 : Math.max(-1, Math.min(1, x));
+    input.moveX = value;
 
     if (knob.current) {
-      const travelX = dx * KNOB_TRAVEL * 100;
-      const travelY = dy * KNOB_TRAVEL * 100;
-      knob.current.style.transform = `translate(calc(-50% + ${travelX}%), calc(-50% + ${travelY}%))`;
+      const travel = value * KNOB_TRAVEL * 100;
+      knob.current.style.transform = `translate(calc(-50% + ${travel}%), -50%)`;
     }
   }, []);
 
@@ -49,10 +42,7 @@ function SteeringStick() {
 
       const rect = element.getBoundingClientRect();
       const radius = rect.width / 2;
-      applyDirection(
-        (event.clientX - (rect.left + radius)) / radius,
-        (event.clientY - (rect.top + radius)) / radius,
-      );
+      applyDirection((event.clientX - (rect.left + radius)) / radius);
     },
     [applyDirection],
   );
@@ -67,10 +57,10 @@ function SteeringStick() {
   const end = (event: React.PointerEvent<HTMLDivElement>) => {
     if (activePointer.current !== event.pointerId) return;
     activePointer.current = null;
-    applyDirection(0, 0);
+    applyDirection(0);
   };
 
-  useEffect(() => () => applyDirection(0, 0), [applyDirection]);
+  useEffect(() => () => applyDirection(0), [applyDirection]);
 
   return (
     <div
@@ -80,13 +70,14 @@ function SteeringStick() {
       onPointerMove={track}
       onPointerUp={end}
       onPointerCancel={end}
-      role="application"
-      aria-label="Direcional"
+      role="slider"
+      aria-label="Volante"
+      aria-valuemin={-1}
+      aria-valuemax={1}
+      aria-valuenow={0}
     >
       <span className="stick__hint stick__hint--left">◀</span>
       <span className="stick__hint stick__hint--right">▶</span>
-      <span className="stick__hint stick__hint--up">▲</span>
-      <span className="stick__hint stick__hint--down">▼</span>
       <div ref={knob} className="stick__knob" />
     </div>
   );

@@ -25,21 +25,22 @@ npm run build && npm start
 
 | Ação | Teclado | Toque |
 | --- | --- | --- |
-| Direção | `W` `A` `S` `D` ou setas | direcional analógico, à esquerda |
-| Acelerar / ré | (a própria direção) | pedais **Acelerar** e **Ré**, à direita |
+| Acelerar / ré | `W` `S` ou ↑ ↓ | pedais **Acelerar** e **Ré**, à direita |
+| Lado da tela | `A` `D` ou ← → | volante analógico, à esquerda |
 | Freio | `Espaço` | — |
 | Voltar à largada | `R` | botão "Reiniciar posição" |
 | Abrir o mapa | `M` | tocar no minimapa |
 
-**As direções seguem a tela, não o carro.** Apertar "direita" significa "vá para a
-direita da tela": o carro esterça sozinho até se alinhar com essa direção, como nos
-jogos de câmera livre. Sem isso, dirigir na direção da câmera inverte os comandos e
-o jogador se perde — que é o problema clássico de câmera fixa.
+A tração é relativa ao carro (`W` acelera, `S` dá ré), mas **o lado segue a tela**:
+apertar `D` significa "vá para a direita da tela" e o carro esterça até se alinhar.
+Sem isso, com o carro vindo na direção da câmera os comandos laterais aparecem
+invertidos — o problema clássico de câmera fixa.
 
-Como isso funciona: o input vira um vetor no espaço da câmera, e a diferença entre
-esse rumo e o do carro define o esterço (saturado a partir de 45° de desvio). Com o
-destino atrás e o carro devagar, ele engata a ré e manobra em vez de descrever a
-volta inteira. No celular o direcional só aponta o rumo — quem dá tração é o pedal.
+Na prática: `A`/`D` viram um rumo no espaço da câmera, e a diferença entre esse rumo
+e o do carro define o esterço, saturando a partir de 45° de desvio. Andando de ré é
+a traseira que aponta para onde o carro vai, então o cálculo usa ela — e o comando
+espelha, porque a física já inverte o esterço com velocidade negativa. No celular o
+volante só escolhe o lado; quem dá tração é o pedal.
 
 A lista de seções no canto da tela também é um atalho: clicar em um item leva o carro
 direto até a zona correspondente, para quem não quiser dirigir.

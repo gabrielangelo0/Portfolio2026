@@ -38,7 +38,10 @@ function Intro() {
 
         <ul className="intro__keys">
           <li>
-            <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> mover (segue a tela)
+            <kbd>W</kbd> <kbd>S</kbd> acelerar e ré
+          </li>
+          <li>
+            <kbd>A</kbd> <kbd>D</kbd> lado da tela
           </li>
           <li>
             <kbd>Espaço</kbd> freio

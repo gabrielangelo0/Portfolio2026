@@ -4,14 +4,14 @@
  * Estado de input compartilhado entre teclado, toque e o loop de física.
  * Fica fora do React de propósito: é lido a cada frame e não deve causar render.
  *
- * `moveX`/`moveY` são a direção desejada **no espaço da tela**, não no do carro:
- * empurrar para a direita significa "vá para a direita da tela", e o carro
+ * `moveY` é tração relativa ao carro (acelerar/ré). `moveX` é o lado **da tela**
+ * para onde ir: apertar direita significa "vá para a direita da tela", e o carro
  * esterça até se alinhar. Sem isso, dirigir na direção da câmera inverte os
- * comandos e o jogador se perde.
+ * comandos laterais e o jogador se perde.
  */
 export const input = {
-  moveX: 0, // -1 esquerda da tela .. 1 direita
-  moveY: 0, // -1 em direção ao observador .. 1 para o fundo
+  moveX: 0, // lado da tela: -1 esquerda .. 1 direita
+  moveY: 0, // tração: -1 ré .. 1 acelerar
   throttle: 0, // pedal de acelerar (toque)
   reverse: 0, // pedal de ré (toque)
   brake: 0,
