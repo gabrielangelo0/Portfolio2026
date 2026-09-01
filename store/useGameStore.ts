@@ -14,6 +14,8 @@ type GameState = {
   /** Id da zona para onde o carro deve ser levado, com contador para repetir o mesmo destino. */
   teleport: { id: string; nonce: number } | null;
   goToZone: (id: string) => void;
+  muted: boolean;
+  toggleMuted: () => void;
 };
 
 export const useGameStore = create<GameState>((set) => ({
@@ -27,6 +29,8 @@ export const useGameStore = create<GameState>((set) => ({
   setOpenPanel: (id) => set({ openPanel: id }),
   setSpeed: (v) => set({ speed: v }),
   reset: () => set((s) => ({ resetSignal: s.resetSignal + 1 })),
+  muted: false,
+  toggleMuted: () => set((s) => ({ muted: !s.muted })),
   teleport: null,
   goToZone: (id) =>
     set((s) => ({

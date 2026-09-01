@@ -124,6 +124,12 @@ kbd {
   box-shadow: 0 18px 40px rgba(255, 61, 128, 0.38);
 }
 
+.intro__sound {
+  margin: -16px 0 22px;
+  color: rgba(167, 157, 200, 0.75);
+  font-size: 0.8rem;
+}
+
 .intro__keys {
   display: flex;
   flex-wrap: wrap;
@@ -169,6 +175,11 @@ kbd {
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+.hud__actions {
+  display: flex;
+  gap: 8px;
 }
 
 .hud__reset {
@@ -547,7 +558,12 @@ kbd {
     font-size: 1.2rem;
   }
 
-  .hud__reset {
+  .hud__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.hud__reset {
     padding: 6px 10px;
     font-size: 0.7rem;
   }

@@ -12,6 +12,7 @@ import {
 import * as THREE from "three";
 import { CarModel, WHEEL_RADIUS } from "./CarModel";
 import { input, bindKeyboard } from "@/lib/controls";
+import { audio } from "@/lib/audio";
 import { projects } from "@/lib/data";
 import { useGameStore } from "@/store/useGameStore";
 
@@ -149,6 +150,7 @@ export function Car() {
 
     // aderência lateral: mata o deslizamento para o carro "morder" a curva
     const lateral = velocity.dot(right);
+    audio.updateEngine(signedSpeed, throttle, lateral);
     impulse.copy(right).multiplyScalar(-lateral * GRIP * delta);
     rb.applyImpulse(impulse, true);
 
@@ -246,7 +248,10 @@ export function Car() {
           break;
         }
       }
-      if (near !== store.activeZone) store.setActiveZone(near);
+      if (near !== store.activeZone) {
+        if (near) audio.zoneReached();
+        store.setActiveZone(near);
+      }
     }
   });
 
@@ -259,6 +264,13 @@ export function Car() {
       linearDamping={0.55}
       angularDamping={4}
       enabledRotations={[false, true, false]}
+      onCollisionEnter={() => {
+        // a intensidade vem da velocidade no instante do toque
+        const rb = body.current;
+        if (!rb) return;
+        const { x, z } = rb.linvel();
+        audio.impact(Math.min(Math.hypot(x, z) / 12, 1));
+      }}
       canSleep={false}
       ccd
     >

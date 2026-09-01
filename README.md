@@ -39,6 +39,27 @@ caminho.
 A lista de seções no canto da tela também é um atalho: clicar em um item leva o carro
 direto até a zona correspondente, para quem não quiser dirigir.
 
+## Som
+
+Todo o áudio é **sintetizado em Web Audio** — nenhum arquivo para baixar, no mesmo
+espírito do resto do projeto ([lib/audio.ts](lib/audio.ts)):
+
+- **motor procedural**: três parciais por um filtro passa-baixa, com frequência,
+  corte e ganho acompanhando velocidade e acelerador — reage de verdade, em vez de
+  tocar um loop gravado;
+- **derrapagem**: ruído em passa-banda que só aparece quando o carro escorrega de
+  lado com velocidade;
+- **trilha ambiente**: progressão Am–F–C–G em pad, com melodia em pentatônica de lá
+  menor sorteada a cada compasso, agendada com lookahead (`setInterval` sozinho não
+  é preciso o bastante para música);
+- **efeitos**: batida (ruído + "toc" grave, com a intensidade vinda da velocidade no
+  instante da colisão) e um sino de duas notas ao chegar numa seção.
+
+O contexto de áudio nasce dentro do clique em "Entrar no carro" — a política de
+autoplay exige um gesto do usuário — e é suspenso quando a aba sai de vista. O botão
+🔊 no HUD silencia tudo. Se o navegador recusar criar o contexto, o jogo entra normal,
+só que mudo: o áudio nunca bloqueia a entrada.
+
 ## Estrutura
 
 ```
@@ -55,6 +76,7 @@ components/
 app/inspect/         oficina do modelo do carro (ver abaixo)
 lib/data.ts          SEU CONTEÚDO: perfil e seções do portfólio
 lib/controls.ts      estado de input compartilhado (fora do React, por performance)
+lib/audio.ts         motor, trilha e efeitos, todos sintetizados
 store/               estado da aplicação (zustand)
 ```
 

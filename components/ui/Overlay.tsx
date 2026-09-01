@@ -1,12 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
+import { audio } from "@/lib/audio";
 import { profile, projects } from "@/lib/data";
 import { useGameStore } from "@/store/useGameStore";
 import { TouchControls } from "./TouchControls";
 
 function Intro() {
   const start = useGameStore((s) => s.start);
+  const muted = useGameStore((s) => s.muted);
+
+  const enter = () => {
+    // O áudio nunca pode impedir a entrada: a política de autoplay exige que o
+    // contexto nasça dentro do gesto, mas se ele falhar o jogo segue mudo.
+    try {
+      audio.start();
+      audio.setMuted(muted);
+    } catch {
+      // sem áudio nesta sessão
+    }
+    start();
+  };
+
   return (
     <div className="intro">
       <div className="intro__card">
@@ -14,8 +29,9 @@ function Intro() {
         <h1 className="intro__name">{profile.name}</h1>
         <p className="intro__role">{profile.role}</p>
         <p className="intro__tagline">{profile.tagline}</p>
+        <p className="intro__sound">Com som — dá para silenciar a qualquer momento.</p>
 
-        <button className="intro__button" onClick={start} autoFocus>
+        <button className="intro__button" onClick={enter} autoFocus>
           Entrar no carro
         </button>
 
@@ -38,6 +54,8 @@ function Intro() {
 function Hud() {
   const speed = useGameStore((s) => s.speed);
   const reset = useGameStore((s) => s.reset);
+  const muted = useGameStore((s) => s.muted);
+  const toggleMuted = useGameStore((s) => s.toggleMuted);
   const kmh = Math.round(speed * 6);
 
   return (
@@ -46,9 +64,19 @@ function Hud() {
         <span className="hud__value">{kmh}</span>
         <span className="hud__unit">km/h</span>
       </div>
-      <button className="hud__reset" onClick={reset}>
-        Reiniciar posição <kbd>R</kbd>
-      </button>
+      <div className="hud__actions">
+        <button
+          className="hud__reset"
+          onClick={toggleMuted}
+          aria-pressed={muted}
+          title={muted ? "Ligar o som" : "Silenciar"}
+        >
+          {muted ? "🔇" : "🔊"} som
+        </button>
+        <button className="hud__reset" onClick={reset}>
+          Reiniciar <kbd>R</kbd>
+        </button>
+      </div>
     </div>
   );
 }
@@ -114,6 +142,18 @@ function Compass() {
 
 export function Overlay() {
   const started = useGameStore((s) => s.started);
+  const muted = useGameStore((s) => s.muted);
+
+  useEffect(() => {
+    audio.setMuted(muted);
+  }, [muted]);
+
+  useEffect(() => {
+    // nada de trilha tocando com a aba em segundo plano
+    const onVisibility = () => audio.setActive(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
 
   useEffect(() => {
     // evita a página rolar quando o jogador usa as setas
