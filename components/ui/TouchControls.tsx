@@ -17,23 +17,28 @@ function capturePointer(element: Element, pointerId: number) {
 const KNOB_TRAVEL = 0.62; // fração do raio que o polegar percorre
 
 /**
- * Volante analógico: o esterço é proporcional ao quanto o polegar se afasta do
- * centro, e não 0 ou 1 como nos botões que havia aqui antes. `input.left` e
- * `input.right` aceitam frações — a física já usa a diferença entre os dois.
+ * Direcional analógico de 360°: o polegar aponta para onde ir **na tela** e o
+ * carro esterça até se alinhar, como nos jogos de câmera livre. Só apontar não
+ * move — a tração vem dos pedais.
  */
 function SteeringStick() {
   const base = useRef<HTMLDivElement>(null);
   const knob = useRef<HTMLDivElement>(null);
   const activePointer = useRef<number | null>(null);
 
-  const applySteer = useCallback((value: number) => {
-    const steer = Math.abs(value) < DEAD_ZONE ? 0 : value;
-    input.right = Math.max(0, steer);
-    input.left = Math.max(0, -steer);
+  const applyDirection = useCallback((x: number, y: number) => {
+    const length = Math.hypot(x, y);
+    const clamped = length > 1 ? 1 / length : 1;
+    const dx = length < DEAD_ZONE ? 0 : x * clamped;
+    const dy = length < DEAD_ZONE ? 0 : y * clamped;
+
+    input.moveX = dx;
+    input.moveY = -dy; // no canvas o Y cresce para baixo; na tela, para cima
 
     if (knob.current) {
-      const travel = steer * KNOB_TRAVEL * 100;
-      knob.current.style.transform = `translate(calc(-50% + ${travel}%), -50%)`;
+      const travelX = dx * KNOB_TRAVEL * 100;
+      const travelY = dy * KNOB_TRAVEL * 100;
+      knob.current.style.transform = `translate(calc(-50% + ${travelX}%), calc(-50% + ${travelY}%))`;
     }
   }, []);
 
@@ -43,11 +48,13 @@ function SteeringStick() {
       if (!element || activePointer.current !== event.pointerId) return;
 
       const rect = element.getBoundingClientRect();
-      const center = rect.left + rect.width / 2;
-      const offset = (event.clientX - center) / (rect.width / 2);
-      applySteer(Math.max(-1, Math.min(1, offset)));
+      const radius = rect.width / 2;
+      applyDirection(
+        (event.clientX - (rect.left + radius)) / radius,
+        (event.clientY - (rect.top + radius)) / radius,
+      );
     },
-    [applySteer],
+    [applyDirection],
   );
 
   const start = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -60,10 +67,10 @@ function SteeringStick() {
   const end = (event: React.PointerEvent<HTMLDivElement>) => {
     if (activePointer.current !== event.pointerId) return;
     activePointer.current = null;
-    applySteer(0);
+    applyDirection(0, 0);
   };
 
-  useEffect(() => () => applySteer(0), [applySteer]);
+  useEffect(() => () => applyDirection(0, 0), [applyDirection]);
 
   return (
     <div
@@ -73,21 +80,20 @@ function SteeringStick() {
       onPointerMove={track}
       onPointerUp={end}
       onPointerCancel={end}
-      role="slider"
-      aria-label="Volante"
-      aria-valuemin={-1}
-      aria-valuemax={1}
-      aria-valuenow={0}
+      role="application"
+      aria-label="Direcional"
     >
       <span className="stick__hint stick__hint--left">◀</span>
       <span className="stick__hint stick__hint--right">▶</span>
+      <span className="stick__hint stick__hint--up">▲</span>
+      <span className="stick__hint stick__hint--down">▼</span>
       <div ref={knob} className="stick__knob" />
     </div>
   );
 }
 
 type PedalProps = {
-  action: "forward" | "backward";
+  action: "throttle" | "reverse";
   label: string;
   hint: string;
   className: string;
@@ -127,8 +133,8 @@ export function TouchControls() {
     <>
       <SteeringStick />
       <div className="pedals">
-        <Pedal action="backward" label="R" hint="Ré" className="pedal--reverse" />
-        <Pedal action="forward" label="▲" hint="Acelerar" className="pedal--throttle" />
+        <Pedal action="reverse" label="R" hint="Ré" className="pedal--reverse" />
+        <Pedal action="throttle" label="▲" hint="Acelerar" className="pedal--throttle" />
       </div>
     </>
   );

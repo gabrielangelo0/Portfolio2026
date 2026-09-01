@@ -595,6 +595,19 @@ kbd {
 .stick__hint--left { left: 10px; }
 .stick__hint--right { right: 10px; }
 
+.stick__hint--up {
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.stick__hint--down {
+  top: auto;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .pedals {
   position: absolute;
   right: 20px;

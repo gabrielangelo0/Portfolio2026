@@ -14,7 +14,7 @@ export type Project = {
 export const profile = {
   name: "Gabriel Angelo",
   role: "Full Stack Developer",
-  tagline: "Dirija pelo portfólio — WASD ou setas para mover.",
+  tagline: "Dirija pelo portfólio — aponte para onde quer ir e o carro faz a curva.",
   email: "gabrielangelolira@gmail.com",
   links: [
     { label: "GitHub", url: "https://github.com" },
