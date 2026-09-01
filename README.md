@@ -25,10 +25,16 @@ npm run build && npm start
 
 | Ação | Teclado | Toque |
 | --- | --- | --- |
-| Acelerar / ré | `W` `S` ou ↑ ↓ | botões ▲ ▼ |
-| Esterçar | `A` `D` ou ← → | botões ◀ ▶ |
+| Acelerar / ré | `W` `S` ou ↑ ↓ | pedais **Acelerar** e **Ré**, à direita |
+| Esterçar | `A` `D` ou ← → | volante analógico, à esquerda |
 | Freio | `Espaço` | — |
 | Voltar à largada | `R` | botão "Reiniciar posição" |
+
+No celular o volante é **analógico**: o esterço é proporcional ao quanto o polegar
+se afasta do centro, com zona morta de 12% e retorno automático. `input.left` e
+`input.right` aceitam frações justamente para isso — a física usa a diferença
+entre os dois, então teclado (0 ou 1) e volante (contínuo) passam pelo mesmo
+caminho.
 
 A lista de seções no canto da tela também é um atalho: clicar em um item leva o carro
 direto até a zona correspondente, para quem não quiser dirigir.

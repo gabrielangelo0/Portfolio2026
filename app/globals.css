@@ -380,38 +380,100 @@ kbd {
 }
 
 /* ---------- Controles de toque ---------- */
-.touch {
+.stick {
   position: absolute;
   left: 20px;
   bottom: 24px;
-  display: grid;
-  grid-template-areas:
-    ". up ."
-    "left down right";
-  gap: 8px;
+  width: 128px;
+  height: 128px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(40, 34, 66, 0.9), rgba(20, 17, 34, 0.8));
+  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.5);
+  touch-action: none;
+  user-select: none;
   z-index: 20;
 }
 
-.touch__btn {
-  width: 58px;
-  height: 58px;
+.stick__knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #ff8a5c, #ff3d80);
+  box-shadow: 0 6px 18px rgba(255, 61, 128, 0.35);
+  transform: translate(-50%, -50%);
+  transition: transform 0.08s ease-out;
+  pointer-events: none;
+}
+
+.stick__hint {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(167, 157, 200, 0.55);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+.stick__hint--left { left: 10px; }
+.stick__hint--right { right: 10px; }
+
+.pedals {
+  position: absolute;
+  right: 20px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 20;
+}
+
+.pedal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 84px;
   border: 1px solid var(--border);
-  border-radius: 14px;
-  background: rgba(24, 20, 40, 0.75);
+  border-radius: 18px;
+  background: rgba(24, 20, 40, 0.8);
   color: var(--ink);
-  font-size: 1.1rem;
   touch-action: none;
   user-select: none;
+  transition: background 0.12s ease, transform 0.12s ease;
 }
 
-.touch__btn:active {
-  background: rgba(255, 107, 74, 0.35);
+.pedal__label {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
-.touch__up { grid-area: up; }
-.touch__down { grid-area: down; }
-.touch__left { grid-area: left; }
-.touch__right { grid-area: right; }
+.pedal__hint {
+  color: var(--muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pedal--throttle {
+  height: 96px;
+  border-color: rgba(255, 107, 74, 0.5);
+  background: linear-gradient(180deg, rgba(255, 107, 74, 0.28), rgba(24, 20, 40, 0.85));
+}
+
+.pedal--reverse {
+  height: 58px;
+}
+
+.pedal:active {
+  transform: scale(0.96);
+  background: rgba(255, 107, 74, 0.45);
+}
 
 @media (max-width: 640px) {
   /* Em telas estreitas a lista vira uma barra de chips no topo. */
@@ -451,11 +513,11 @@ kbd {
 
   .panel {
     top: auto;
-    bottom: 190px;
+    bottom: 172px;
     right: 10px;
     left: 10px;
     width: auto;
-    max-height: 45vh;
+    max-height: 42vh;
     overflow-y: auto;
   }
 
@@ -467,21 +529,51 @@ kbd {
     font-size: 0.85rem;
   }
 
+  /* o canto inferior direito agora é dos pedais: o HUD vai para o meio */
   .hud {
-    right: 10px;
-    bottom: 14px;
+    left: 50%;
+    right: auto;
+    bottom: 16px;
+    transform: translateX(-50%);
+    align-items: center;
+    gap: 8px;
   }
 
   .hud__speed {
-    padding: 6px 12px;
+    padding: 5px 12px;
   }
 
   .hud__value {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
-  .touch__btn {
-    width: 52px;
-    height: 52px;
+  .hud__reset {
+    padding: 6px 10px;
+    font-size: 0.7rem;
+  }
+
+  .stick {
+    left: 14px;
+    bottom: 18px;
+    width: 116px;
+    height: 116px;
+  }
+
+  .stick__knob {
+    width: 50px;
+    height: 50px;
+  }
+
+  .pedals {
+    right: 14px;
+    bottom: 18px;
+  }
+
+  .pedal {
+    width: 74px;
+  }
+
+  .pedal--throttle {
+    height: 86px;
   }
 }
