@@ -390,6 +390,169 @@ kbd {
   text-transform: uppercase;
 }
 
+/* ---------- Minimapa ---------- */
+.minimap {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: #13101f;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  line-height: 0;
+  z-index: 20;
+}
+
+.minimap canvas {
+  border-radius: 50%;
+  display: block;
+}
+
+.minimap__badge {
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  padding: 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(18, 15, 31, 0.95);
+  color: var(--muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.minimap:hover .minimap__badge {
+  color: var(--ink);
+}
+
+/* ---------- Mapa aberto ---------- */
+.worldmap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(10, 8, 18, 0.72);
+  backdrop-filter: blur(6px);
+  z-index: 40;
+}
+
+.worldmap__panel {
+  /* o grid é quadrado: a largura precisa respeitar a altura disponível também */
+  width: min(620px, 100%, calc(100dvh - 160px));
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+}
+
+.worldmap__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.worldmap__header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+}
+
+.worldmap__close {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.worldmap__close:hover {
+  color: var(--ink);
+}
+
+.worldmap__grid {
+  position: relative;
+  aspect-ratio: 1;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background-color: #14111f;
+  background-image:
+    linear-gradient(rgba(120, 104, 190, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 104, 190, 0.16) 1px, transparent 1px);
+  background-size: 10.86% 10.86%;
+  overflow: hidden;
+}
+
+.worldmap__start {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 3px 9px;
+  border: 1px dashed var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.worldmap__zone {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid var(--zone);
+  border-radius: 999px;
+  background: rgba(18, 15, 31, 0.9);
+  color: var(--ink);
+  font-size: 0.74rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.worldmap__zone i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--zone);
+}
+
+.worldmap__zone:hover,
+.worldmap__zone.is-active {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 0 22px var(--zone);
+}
+
+.worldmap__car {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 14px solid #ffffff;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
+}
+
+.worldmap__hint {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  text-align: center;
+}
+
 /* ---------- Controles de toque ---------- */
 .stick {
   position: absolute;
@@ -566,6 +729,32 @@ kbd {
 .hud__reset {
     padding: 6px 10px;
     font-size: 0.7rem;
+  }
+
+  .minimap {
+    left: auto;
+    right: 10px;
+    top: 62px;
+    bottom: auto;
+    border-width: 1px;
+  }
+
+  .minimap canvas {
+    width: 96px !important;
+    height: 96px !important;
+  }
+
+  .minimap__badge {
+    display: none;
+  }
+
+  .worldmap__panel {
+    padding: 14px;
+  }
+
+  .worldmap__zone {
+    padding: 4px 8px;
+    font-size: 0.66rem;
   }
 
   .stick {

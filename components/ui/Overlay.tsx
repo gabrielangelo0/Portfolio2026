@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { audio } from "@/lib/audio";
 import { profile, projects } from "@/lib/data";
 import { useGameStore } from "@/store/useGameStore";
+import { Minimap, WorldMap } from "./Minimap";
 import { TouchControls } from "./TouchControls";
 
 function Intro() {
@@ -44,6 +45,9 @@ function Intro() {
           </li>
           <li>
             <kbd>R</kbd> voltar ao início
+          </li>
+          <li>
+            <kbd>M</kbd> mapa
           </li>
         </ul>
       </div>
@@ -143,6 +147,7 @@ function Compass() {
 export function Overlay() {
   const started = useGameStore((s) => s.started);
   const muted = useGameStore((s) => s.muted);
+  const [mapOpen, setMapOpen] = useState(false);
 
   useEffect(() => {
     audio.setMuted(muted);
@@ -153,6 +158,14 @@ export function Overlay() {
     const onVisibility = () => audio.setActive(document.visibilityState === "visible");
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.code === "KeyM") setMapOpen((open) => !open);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   useEffect(() => {
@@ -173,6 +186,8 @@ export function Overlay() {
       <Hud />
       <Compass />
       <ProjectPanel />
+      <Minimap onExpand={() => setMapOpen(true)} />
+      {mapOpen && <WorldMap onClose={() => setMapOpen(false)} />}
       <TouchControls />
     </>
   );

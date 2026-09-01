@@ -29,6 +29,7 @@ npm run build && npm start
 | Esterçar | `A` `D` ou ← → | volante analógico, à esquerda |
 | Freio | `Espaço` | — |
 | Voltar à largada | `R` | botão "Reiniciar posição" |
+| Abrir o mapa | `M` | tocar no minimapa |
 
 No celular o volante é **analógico**: o esterço é proporcional ao quanto o polegar
 se afasta do centro, com zona morta de 12% e retorno automático. `input.left` e
@@ -38,6 +39,20 @@ caminho.
 
 A lista de seções no canto da tela também é um atalho: clicar em um item leva o carro
 direto até a zona correspondente, para quem não quiser dirigir.
+
+## Mapa
+
+Minimapa no estilo GTA: o carro fica fixo no centro apontando para cima e o mundo
+gira em volta; seções fora do alcance viram blips presos na borda, indicando a
+direção. Clicar nele (ou `M`) abre o mapa inteiro, onde cada seção é um botão que
+leva o carro até lá.
+
+A geometria do cenário mora em [lib/world.ts](lib/world.ts) — arena, largada,
+rampas, caixas e o gerador procedural de árvores — porque o mundo 3D e o mapa
+desenham os mesmos objetos: duplicar as posições faria o mapa mentir assim que o
+cenário mudasse. A pose do carro é publicada em [lib/carState.ts](lib/carState.ts),
+fora do React, e o minimapa desenha no próprio `requestAnimationFrame`; passar por
+estado faria o overlay renderizar 60 vezes por segundo.
 
 ## Som
 

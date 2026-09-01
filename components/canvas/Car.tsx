@@ -13,6 +13,7 @@ import * as THREE from "three";
 import { CarModel, WHEEL_RADIUS } from "./CarModel";
 import { input, bindKeyboard } from "@/lib/controls";
 import { audio } from "@/lib/audio";
+import { carState } from "@/lib/carState";
 import { projects } from "@/lib/data";
 import { useGameStore } from "@/store/useGameStore";
 
@@ -181,6 +182,12 @@ export function Car() {
 
     const translation = rb.translation();
     carPosition.set(translation.x, translation.y, translation.z);
+
+    // publica a pose para o minimapa, que desenha fora do Canvas
+    carState.x = translation.x;
+    carState.z = translation.z;
+    carState.yaw = Math.atan2(forward.x, forward.z);
+    carState.speed = signedSpeed;
 
     // O corpo tem pitch e roll travados para nunca capotar, então a inclinação
     // é visual: quatro sondas medem a altura do chão em volta e o modelo é
