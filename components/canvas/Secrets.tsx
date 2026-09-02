@@ -172,7 +172,19 @@ function Ufo() {
           </mesh>
         );
       })}
-      <pointLight position={[0, -0.6, 0]} color="#8ce9ff" intensity={14} distance={9} />
+      {/* facho: cone aditivo, pelo mesmo motivo do halo */}
+      <mesh position={[0, -1.9, 0]} renderOrder={2}>
+        <coneGeometry args={[1.5, 3.4, 20, 1, true]} />
+        <meshBasicMaterial
+          color="#8ce9ff"
+          transparent
+          opacity={0.2}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          side={THREE.DoubleSide}
+          fog={false}
+        />
+      </mesh>
     </group>
   );
 }
@@ -208,6 +220,15 @@ const SHAPES: Record<SecretKind, () => React.ReactElement> = {
   floppy: Floppy,
 };
 
+/**
+ * Opacidade do halo que marca o segredo. O brilho é um casco aditivo, e não uma
+ * luz, de propósito: o número de luzes da cena entra na chave de shader do
+ * three.js, então tirar uma ao coletar obrigava TODOS os materiais a recompilar
+ * — 14 programas novos de uma vez, e o jogo travava por segundos a cada objeto
+ * pego.
+ */
+const HALO_OPACITY = 0.16;
+
 /** Quanto tempo o objeto leva para subir e sumir depois de coletado. */
 const COLLECT_TIME = 0.7;
 /** Escala base: no tamanho natural, um pato some ao lado de um pinheiro. */
@@ -216,7 +237,7 @@ const SECRET_SCALE = 1.5;
 function SecretItem({ secret }: { secret: Secret }) {
   const found = useGameStore((s) => s.foundSecrets.includes(secret.id));
   const group = useRef<THREE.Group>(null);
-  const glow = useRef<THREE.PointLight>(null);
+  const glow = useRef<THREE.Mesh>(null);
   const collected = useRef(0);
   // desmonta de vez no fim da animação, em vez de deixar um grupo invisível
   // consumindo desenho para sempre
@@ -231,8 +252,11 @@ function SecretItem({ secret }: { secret: Secret }) {
     const delta = Math.min(rawDelta, 1 / 20);
     const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.6) * 0.35;
 
+    const halo = glow.current?.material as THREE.MeshBasicMaterial | undefined;
+
     if (!found) {
-      if (glow.current) glow.current.intensity = 9 * pulse;
+      if (halo) halo.opacity = HALO_OPACITY * pulse;
+      if (glow.current) glow.current.scale.setScalar(0.96 + 0.08 * pulse);
       return;
     }
 
@@ -245,7 +269,7 @@ function SecretItem({ secret }: { secret: Secret }) {
     group.current.rotation.y = t * 9;
     // um estufo no comecinho antes de encolher, para o sumiço ter um tempo
     group.current.scale.setScalar(SECRET_SCALE * (1 + 0.4 * Math.sin(Math.PI * t)) * (1 - t));
-    if (glow.current) glow.current.intensity = 9 * (1 - t) * pulse;
+    if (halo) halo.opacity = 0.16 * (1 - t) * pulse;
 
     if (t >= 1) setGone(true);
   });
@@ -255,7 +279,17 @@ function SecretItem({ secret }: { secret: Secret }) {
   return (
     <group ref={group} position={[x, y, z]} scale={SECRET_SCALE}>
       <Shape />
-      <pointLight ref={glow} position={[0, 1.6, 0]} color="#ffe6a8" distance={12} />
+      <mesh ref={glow} position={[0, 1, 0]} renderOrder={2}>
+        <sphereGeometry args={[1.5, 16, 12]} />
+        <meshBasicMaterial
+          color="#ffe6a8"
+          transparent
+          opacity={HALO_OPACITY}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+          fog={false}
+        />
+      </mesh>
     </group>
   );
 }

@@ -99,6 +99,14 @@ That crowding had a cost worth knowing about: with the track, the finish clearin
 secrets all claiming space, the house generator went from thirteen cottages to four,
 because it gave up on the first collision. It now tries several spots per house.
 
+A trap worth writing down: the first version gave each secret a `pointLight`, and
+collecting one dropped it from the scene. `NUM_POINT_LIGHTS` is part of three.js's shader
+key, so losing a single light forced **every material in the scene to recompile** —
+measured at 40 programs before and 54 after, which is the second or two of freeze that
+showed up on every pickup. The glow is now an additive shell instead, and the UFO's beam
+a cone. Light count now holds at 11 through a pickup (it was 18 before), so the whole
+scene got cheaper too.
+
 ## The scenery
 
 A green valley ringed by mountains, with forest, a hamlet and a lake — all generated in
