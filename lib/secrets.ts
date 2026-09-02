@@ -5,6 +5,8 @@
  *
  * Ficam entre o miolo plano e a borda (raio 36 a 40), longe da linha de chegada
  * e um em cada direção, para nenhum passeio esbarrar em dois de uma vez.
+ *
+ * A caçada não é guardada em lugar nenhum: recarregar a página repõe os seis.
  */
 
 export type SecretKind = "duck" | "ladybug" | "coffee" | "sign404" | "ufo" | "floppy";
@@ -57,28 +59,3 @@ export const SECRETS: Secret[] = [
     message: "Save early, save often. Ask your senior what this is.",
   },
 ];
-
-const KEY = "portfolio-secrets";
-
-/** Lê os segredos já encontrados. Sem localStorage disponível, começa do zero. */
-export function loadSecrets(): SecretKind[] {
-  try {
-    const raw = window.localStorage.getItem(KEY);
-    if (!raw) return [];
-    const parsed: unknown = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((id): id is SecretKind =>
-      SECRETS.some((secret) => secret.id === id),
-    );
-  } catch {
-    return [];
-  }
-}
-
-export function saveSecrets(found: SecretKind[]) {
-  try {
-    window.localStorage.setItem(KEY, JSON.stringify(found));
-  } catch {
-    // navegação privada, cota cheia — a caçada só não sobrevive ao reload
-  }
-}

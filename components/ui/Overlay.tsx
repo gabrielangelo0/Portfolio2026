@@ -273,12 +273,7 @@ function useKonami(onUnlock: () => void) {
 export function Overlay() {
   const started = useGameStore((s) => s.started);
   const muted = useGameStore((s) => s.muted);
-  const hydrateSecrets = useGameStore((s) => s.hydrateSecrets);
   const [mapOpen, setMapOpen] = useState(false);
-
-  // o que este visitante já achou vive no navegador dele, e só pode ser lido
-  // depois da hidratação
-  useEffect(() => hydrateSecrets(), [hydrateSecrets]);
 
   const onKonami = useCallback(() => {
     const { celebrate, notify } = useGameStore.getState();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { audio } from "@/lib/audio";
@@ -208,25 +208,52 @@ const SHAPES: Record<SecretKind, () => React.ReactElement> = {
   floppy: Floppy,
 };
 
+/** Quanto tempo o objeto leva para subir e sumir depois de coletado. */
+const COLLECT_TIME = 0.7;
+/** Escala base: no tamanho natural, um pato some ao lado de um pinheiro. */
+const SECRET_SCALE = 1.5;
+
 function SecretItem({ secret }: { secret: Secret }) {
   const found = useGameStore((s) => s.foundSecrets.includes(secret.id));
+  const group = useRef<THREE.Group>(null);
   const glow = useRef<THREE.PointLight>(null);
+  const collected = useRef(0);
+  // desmonta de vez no fim da animação, em vez de deixar um grupo invisível
+  // consumindo desenho para sempre
+  const [gone, setGone] = useState(false);
   const Shape = SHAPES[secret.id];
 
   const [x, z] = secret.position;
   const y = useMemo(() => terrainHeight(x, z), [x, z]);
 
-  useFrame((state) => {
-    if (!glow.current) return;
-    // pulsa devagar; depois de achado fica só um brilho de lembrete
+  useFrame((state, rawDelta) => {
+    if (!group.current) return;
+    const delta = Math.min(rawDelta, 1 / 20);
     const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.6) * 0.35;
-    glow.current.intensity = (found ? 5 : 9) * pulse;
+
+    if (!found) {
+      if (glow.current) glow.current.intensity = 9 * pulse;
+      return;
+    }
+
+    // Coletado: sobe girando e encolhe até sumir. Deixar o objeto parado no
+    // lugar fazia o jogador voltar para tentar pegar o que já tinha pego.
+    collected.current = Math.min(collected.current + delta / COLLECT_TIME, 1);
+    const t = collected.current;
+
+    group.current.position.y = y + t * 3.2;
+    group.current.rotation.y = t * 9;
+    // um estufo no comecinho antes de encolher, para o sumiço ter um tempo
+    group.current.scale.setScalar(SECRET_SCALE * (1 + 0.4 * Math.sin(Math.PI * t)) * (1 - t));
+    if (glow.current) glow.current.intensity = 9 * (1 - t) * pulse;
+
+    if (t >= 1) setGone(true);
   });
 
+  if (gone) return null;
+
   return (
-    // 1.5x: no tamanho natural desses objetos, um pato de borracha some ao lado
-    // de um pinheiro e o jogador passa direto
-    <group position={[x, y, z]} scale={1.5}>
+    <group ref={group} position={[x, y, z]} scale={SECRET_SCALE}>
       <Shape />
       <pointLight ref={glow} position={[0, 1.6, 0]} color="#ffe6a8" distance={12} />
     </group>

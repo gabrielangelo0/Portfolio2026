@@ -84,10 +84,10 @@ Three things the track forced:
 
 Six objects are scattered around the hillside — a rubber duck, a ladybug, a giant coffee
 cup, a 404 road sign, a hovering UFO and a 3½" floppy. Driving within seven metres of one
-counts as finding it: a note slides in, the tally in the corner goes up, and the spot is
-marked on the minimap. What you have found is kept in `localStorage`, so the hunt
-survives a reload. There is a seventh thing, and it is not on the map — try the Konami
-code.
+counts as finding it: a note slides in, the tally in the corner goes up, and the object
+itself rises, spins and shrinks away — leaving it standing there sent players back to
+collect what they had already collected. Nothing is stored, so a reload puts all six
+back. There is a seventh thing, and it is not on the map — try the Konami code.
 
 They also do the scenery a favour. The valley is laid out by sector, and before this the
 south and south-west had almost nothing in them while both ramps sat side by side in the
