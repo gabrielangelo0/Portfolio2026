@@ -436,6 +436,311 @@ kbd {
   text-transform: uppercase;
 }
 
+.intro__alt {
+  display: inline-block;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.intro__alt:hover {
+  color: var(--ink);
+  border-bottom-color: var(--border);
+}
+
+/* ---------- Portfólio em página (/classic) ---------- */
+/* O body do jogo trava o scroll; aqui a rolagem fica no próprio contêiner. */
+.reader {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(124, 107, 255, 0.16), transparent 70%),
+    var(--bg);
+  -webkit-overflow-scrolling: touch;
+}
+
+.reader__inner {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 72px 24px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+}
+
+.reader__hero {
+  padding: 40px 36px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--panel);
+}
+
+.reader__eyebrow {
+  margin: 0 0 10px;
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.reader__name {
+  margin: 0 0 20px;
+  font-size: clamp(2.1rem, 6vw, 3.1rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.reader__lead {
+  margin: 0 0 16px;
+  max-width: 62ch;
+  color: rgba(226, 220, 245, 0.86);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.reader__lead strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.reader__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.reader__button {
+  display: inline-block;
+  padding: 11px 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #ff6b4a, #ff3f8e);
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.reader__button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(255, 80, 110, 0.28);
+}
+
+.reader__button.is-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--ink);
+}
+
+.reader__button.is-ghost:hover {
+  border-color: rgba(160, 140, 255, 0.55);
+  box-shadow: none;
+}
+
+.reader__heading {
+  margin: 0 0 22px;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+
+.reader__stack {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 20px;
+}
+
+.reader__stack-group h3 {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.reader__stack-group ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reader__stack-group li {
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.82rem;
+}
+
+/* linha do tempo: mesma que os pórticos da pista contam */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline__item {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 18px;
+  padding: 16px 0 16px 0;
+  border-left: 2px solid var(--border);
+  padding-left: 22px;
+  margin-left: 8px;
+  position: relative;
+}
+
+.timeline__item::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 24px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.timeline__item.is-now::before {
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(255, 107, 74, 0.18);
+}
+
+.timeline__year {
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.timeline__title {
+  margin: 0 0 5px;
+  font-size: 1.02rem;
+}
+
+.timeline__detail {
+  margin: 0;
+  max-width: 58ch;
+  color: rgba(226, 220, 245, 0.78);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.reader__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--zone);
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+.card__subtitle {
+  margin: 0;
+  color: var(--zone);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.card__title {
+  margin: 0;
+  font-size: 1.12rem;
+}
+
+.card__description {
+  margin: 0;
+  color: rgba(226, 220, 245, 0.8);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.card__stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card__stack li {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.card__link {
+  margin-top: auto;
+  padding-top: 6px;
+  color: var(--zone);
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.card__link:hover {
+  text-decoration: underline;
+}
+
+.reader__contact,
+.reader__drive {
+  padding: 30px 32px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+}
+
+.reader__footer {
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.84rem;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .reader__inner {
+    padding: 44px 16px 72px;
+    gap: 48px;
+  }
+
+  .reader__hero,
+  .reader__contact,
+  .reader__drive {
+    padding: 26px 20px;
+  }
+
+  .timeline__item {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
 /* ---------- Marcos da pista da trajetória ---------- */
 .milestone {
   display: flex;

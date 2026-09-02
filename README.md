@@ -47,6 +47,18 @@ flip it to `true` to bring it back.
 The section list in the corner is also a shortcut: clicking an entry drives the car
 straight to that zone, for visitors who would rather not drive.
 
+## The plain version
+
+Not every visit wants to drive — a recruiter in a hurry, a weak phone, someone who would
+rather just read. `/classic` is the same portfolio as a page: hero, tools, the same dated
+timeline the gates tell, one card per section, and contact. The start screen links to it
+right under the button.
+
+It reads from the same sources as the 3D world — `projects`, `stack` and the career
+milestones — so the two versions cannot drift apart. It ships no WebGL: 3.5 kB against
+12 kB for the driving route, prerendered as static HTML, which also makes it the version
+search engines actually read.
+
 ## The career track
 
 The dirt track that leaves the start pad is the story: it winds through the valley past

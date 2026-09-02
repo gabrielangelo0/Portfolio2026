@@ -23,6 +23,18 @@ export const profile = {
 };
 
 /**
+ * Ferramentas do dia a dia, agrupadas por frente de trabalho. A versão em
+ * página mostra a lista inteira; o mundo 3D só cabe três ou quatro por seção.
+ */
+export const stack: { group: string; items: string[] }[] = [
+  { group: "Languages", items: ["TypeScript", "JavaScript", "Go", "PHP", "Java"] },
+  { group: "Web", items: ["React", "Next.js", "Node.js", "HeroUI", "Three.js"] },
+  { group: "Mobile", items: ["React Native", "Expo"] },
+  { group: "Data", items: ["PostgreSQL", "Redis", "Supabase", "Firebase"] },
+  { group: "Infra & automation", items: ["Docker", "n8n", "WhatsApp API", "REST integrations"] },
+];
+
+/**
  * As zonas ficam distribuídas em um anel ao redor do ponto de partida (0,0),
  * de forma que qualquer direção que o jogador escolha leve a algum conteúdo.
  * O anel tem raio 26: com o disco de 4.2 de raio, a borda mais distante chega a

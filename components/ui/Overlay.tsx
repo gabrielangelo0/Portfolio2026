@@ -41,6 +41,12 @@ function Intro() {
           Get in the car
         </button>
 
+        {/* Nem toda visita quer dirigir: um recrutador com pressa, um celular
+            fraco, alguém que só quer ler. A mesma coisa em página. */}
+        <a className="intro__alt" href="/classic">
+          Rather just read it? See the plain version →
+        </a>
+
         <ul className="intro__keys">
           <li>
             <kbd>W</kbd> <kbd>S</kbd> throttle and reverse
