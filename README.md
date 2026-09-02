@@ -47,6 +47,19 @@ flip it to `true` to bring it back.
 The section list in the corner is also a shortcut: clicking an entry drives the car
 straight to that zone, for visitors who would rather not drive.
 
+## The look
+
+Panels are real glass: `backdrop-filter: blur(30px) saturate(180%)` over a white wash at
+5%, a 1px hairline, and an inset highlight along the top edge — so the start card actually
+filters the valley behind it instead of sitting on a flat purple rectangle. Behind the
+plain page, three blurred colour blooms drift slowly; without something back there, a
+backdrop filter has nothing to filter.
+
+Two things the redesign removed on purpose: the pink-to-orange gradient buttons (the
+primary action is now solid white on dark, where the emphasis comes from contrast) and the
+coloured bar across the top of every section card — seven of those read as a theme picker,
+so the section colour became a single 6px dot next to the label.
+
 ## The plain version
 
 Not every visit wants to drive — a recruiter in a hurry, a weak phone, someone who would

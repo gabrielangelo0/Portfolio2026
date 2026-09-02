@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FINISH, MILESTONES } from "@/lib/career";
 import { profile, projects, stack } from "@/lib/data";
+import { Effects } from "./Effects";
 
 export const metadata: Metadata = {
   title: `${profile.name} — ${profile.role}`,
@@ -21,8 +22,16 @@ export default function ClassicPage() {
 
   return (
     <main className="reader">
+      {/* manchas de cor desfocadas: é o que o vidro tem para filtrar */}
+      <div className="aurora" aria-hidden>
+        <span />
+        <span />
+        <span />
+      </div>
+      <Effects />
+
       <div className="reader__inner">
-        <header className="reader__hero">
+        <header className="reader__hero glass" data-reveal>
           <p className="reader__eyebrow">Portfolio</p>
           <h1 className="reader__name">Hi, I&apos;m Gabriel</h1>
           <p className="reader__lead">
@@ -54,7 +63,7 @@ export default function ClassicPage() {
           </div>
         </header>
 
-        <section className="reader__section">
+        <section className="reader__section" data-reveal>
           <h2 className="reader__heading">Tools I work with</h2>
           <div className="reader__stack">
             {stack.map((group) => (
@@ -70,7 +79,7 @@ export default function ClassicPage() {
           </div>
         </section>
 
-        <section className="reader__section">
+        <section className="reader__section" data-reveal>
           <h2 className="reader__heading">The road so far</h2>
           <ol className="timeline">
             {MILESTONES.map((milestone) => (
@@ -92,14 +101,18 @@ export default function ClassicPage() {
           </ol>
         </section>
 
-        <section className="reader__section">
+        <section className="reader__section" data-reveal>
           <h2 className="reader__heading">What I do</h2>
           <div className="reader__cards">
-            {sections.map((project) => (
+            {sections.map((project, index) => (
               <article
                 key={project.id}
-                className="card"
-                style={{ ["--zone" as string]: project.color }}
+                className="card glass"
+                data-reveal
+                style={{
+                  ["--zone" as string]: project.color,
+                  ["--delay" as string]: `${index * 0.07}s`,
+                }}
               >
                 <p className="card__subtitle">{project.subtitle}</p>
                 <h3 className="card__title">{project.title}</h3>
@@ -120,7 +133,7 @@ export default function ClassicPage() {
         </section>
 
         {contact ? (
-          <section className="reader__section reader__contact">
+          <section className="reader__section reader__contact glass" data-reveal>
             <h2 className="reader__heading">{contact.title}</h2>
             <p className="reader__lead">{contact.description}</p>
             <div className="reader__actions">
@@ -131,7 +144,7 @@ export default function ClassicPage() {
           </section>
         ) : null}
 
-        <section className="reader__section reader__drive">
+        <section className="reader__section reader__drive glass" data-reveal>
           <h2 className="reader__heading">Or take the long way</h2>
           <p className="reader__lead">
             The same story is a valley you can drive through: a dirt track past six dated
@@ -142,7 +155,7 @@ export default function ClassicPage() {
           </Link>
         </section>
 
-        <footer className="reader__footer">
+        <footer className="reader__footer" data-reveal>
           Built with Next.js, React Three Fiber and Rapier. No cookies — just a car.
         </footer>
       </div>
