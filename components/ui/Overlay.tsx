@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { audio } from "@/lib/audio";
 import { carState } from "@/lib/carState";
 import { terrainHeight } from "@/lib/terrain";
@@ -29,6 +30,16 @@ function Intro() {
   return (
     <div className="intro">
       <div className="intro__card">
+        <div className="intro__avatar">
+          <Image
+            src="/gabriel.jpg"
+            alt={profile.name}
+            width={440}
+            height={440}
+            sizes="64px"
+            priority
+          />
+        </div>
         <p className="intro__eyebrow">Interactive portfolio</p>
         <h1 className="intro__name">{profile.name}</h1>
         <p className="intro__role">{profile.role}</p>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { FINISH, MILESTONES } from "@/lib/career";
 import { profile, projects, stack } from "@/lib/data";
@@ -48,8 +49,16 @@ export default function ClassicPage() {
 
       <div className="reader__inner">
         <header className="reader__hero" data-reveal>
-          <div className="monogram" aria-hidden>
-            GA
+          <div className="avatar">
+            <Image
+              src="/gabriel.jpg"
+              alt={profile.name}
+              width={440}
+              height={440}
+              /* o círculo tem 104 px: sem isto o Next serve a variante de 1080 */
+              sizes="104px"
+              priority
+            />
           </div>
 
           <div className="reader__hero-card glass">
