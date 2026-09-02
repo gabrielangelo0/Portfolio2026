@@ -51,14 +51,25 @@ straight to that zone, for visitors who would rather not drive.
 
 Panels are real glass: `backdrop-filter: blur(30px) saturate(180%)` over a white wash at
 5%, a 1px hairline, and an inset highlight along the top edge — so the start card actually
-filters the valley behind it instead of sitting on a flat purple rectangle. Behind the
-plain page, three blurred colour blooms drift slowly; without something back there, a
-backdrop filter has nothing to filter.
+filters the valley behind it instead of sitting on a flat rectangle.
 
-Two things the redesign removed on purpose: the pink-to-orange gradient buttons (the
-primary action is now solid white on dark, where the emphasis comes from contrast) and the
-coloured bar across the top of every section card — seven of those read as a theme picker,
-so the section colour became a single 6px dot next to the label.
+On the plain page the colour *is* the background: five blurred blooms drift across the
+whole viewport at near-full opacity, and every block that carries text sits inside glass,
+so contrast comes from the panel rather than from dimming the art. A light veil and a fine
+grain keep it from reading as a raw CSS gradient.
+
+The moving parts, all disabled under `prefers-reduced-motion`:
+
+- the hero headline **types and deletes** through the four things I build;
+- a **marquee** of technologies runs under it, pausing on hover — the list appears twice
+  and the animation travels exactly half its width, so the seam falls off-screen;
+- sections **rise in on scroll**, cards staggered by 70ms;
+- a **spotlight** in each card's own accent colour follows the pointer.
+
+Two things went on purpose: the pink-to-orange gradient buttons (the primary action is now
+solid white on dark, where emphasis comes from contrast) and the coloured bar across the
+top of every card — seven of those read as a theme picker, so the section colour became a
+badge and a dot.
 
 ## The plain version
 
