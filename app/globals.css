@@ -652,6 +652,209 @@ kbd {
   gap: clamp(80px, 12vh, 128px);
 }
 
+/* ---------- atalho para o carro ---------- */
+/* Fixo no topo e discreto: presente o tempo todo, sem roubar a abertura. */
+.drive-pill {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 17px;
+  border: 1px solid var(--hairline);
+  border-radius: 980px;
+  background: var(--glass);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  box-shadow: var(--glass-shine);
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drive-pill:hover {
+  transform: translateY(-1px);
+  background: var(--glass-strong);
+  color: var(--ink);
+}
+
+/* farol piscando devagar, para o olho achar o atalho sem que ele grite */
+.drive-pill__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  animation: beacon 2.4s ease-in-out infinite;
+}
+
+@keyframes beacon {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (max-width: 640px) {
+  .drive-pill {
+    top: 12px;
+    right: 12px;
+    padding: 8px 14px;
+    font-size: 0.78rem;
+  }
+}
+
+/* ---------- botões de produto ---------- */
+.card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.card__cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 15px;
+  border: 1px solid color-mix(in srgb, var(--zone) 45%, transparent);
+  border-radius: 980px;
+  background: color-mix(in srgb, var(--zone) 16%, transparent);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 590;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.card__cta:hover {
+  background: color-mix(in srgb, var(--zone) 26%, transparent);
+  transform: translateY(-1px);
+}
+
+.card__cta.is-ghost {
+  border-color: var(--hairline);
+  background: var(--glass);
+}
+
+/* ---------- galeria ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  animation: intro-in 0.3s ease both;
+}
+
+.lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgba(4, 4, 10, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  cursor: zoom-out;
+}
+
+.lightbox__panel {
+  position: relative;
+  width: min(820px, 100%);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  overflow: hidden;
+}
+
+.lightbox__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.lightbox__head h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 590;
+  letter-spacing: -0.02em;
+}
+
+.lightbox__head p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.lightbox__close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  background: var(--glass);
+  color: var(--ink);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.lightbox__stage {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* a imagem cabe no palco em vez de esticar: screenshot de celular e de tela
+   larga passam pelo mesmo quadro */
+.lightbox__stage img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.lightbox__foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.lightbox__foot button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  background: var(--glass);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.lightbox__foot button:hover {
+  background: var(--glass-strong);
+}
+
 /* ---------- material ---------- */
 .glass {
   border: 1px solid var(--hairline);

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FINISH, MILESTONES } from "@/lib/career";
 import { profile, projects, stack } from "@/lib/data";
 import { Effects, Typewriter } from "./Effects";
+import { Products } from "./Products";
 
 export const metadata: Metadata = {
   title: `${profile.name} — ${profile.role}`,
@@ -47,6 +48,13 @@ export default function HomePage() {
         <span />
       </div>
       <Effects />
+
+      {/* Atalho discreto, fora de qualquer seção: quem quiser dirigir não deve
+          precisar rolar a página inteira para descobrir que dá. */}
+      <Link className="drive-pill" href="/drive">
+        <span className="drive-pill__dot" aria-hidden />
+        Drive through my portfolio
+      </Link>
 
       <div className="reader__inner">
         <header className="reader__hero" data-reveal>
@@ -125,6 +133,13 @@ export default function HomePage() {
               </ul>
             </article>
           ) : null}
+        </section>
+
+        <section className="reader__section">
+          <h2 className="reader__heading" data-reveal>
+            Things I&apos;ve built
+          </h2>
+          <Products />
         </section>
 
         {/* A faixa acima é decorativa e fica escondida de leitor de tela; a lista
@@ -234,24 +249,6 @@ export default function HomePage() {
             </div>
           </section>
         ) : null}
-
-        <section className="reader__section">
-          <h2 className="reader__heading" data-reveal>
-            Or take the long way
-          </h2>
-          <div className="glass reader__panel is-centered" data-reveal>
-            <p className="reader__lead">
-              The same story is a valley you can drive through: a dirt track past six dated
-              gates, a finish line at the top of the ridge, and six things hidden in the
-              hills.
-            </p>
-            <div className="reader__actions is-centered">
-              <Link className="reader__button" href="/drive">
-                Drive the 3D version
-              </Link>
-            </div>
-          </div>
-        </section>
 
         <footer className="reader__footer" data-reveal>
           Built with Next.js, React Three Fiber and Rapier. No cookies — just a car.

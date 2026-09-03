@@ -34,6 +34,103 @@ export const stack: { group: string; items: string[] }[] = [
   { group: "Infra & automation", items: ["Docker", "n8n", "WhatsApp API", "REST integrations"] },
 ];
 
+export type ProductLink = {
+  label: string;
+  url: string;
+  kind: "site" | "play" | "appstore" | "repo";
+};
+
+export type Product = {
+  id: string;
+  name: string;
+  /** O que eu fiz nele, não o que o produto faz. */
+  role: string;
+  summary: string;
+  stack: string[];
+  accent: string;
+  links: ProductLink[];
+  /** Galeria, para o que não tem página pública para onde apontar. */
+  shots?: { src: string; alt: string }[];
+};
+
+/**
+ * Os sistemas em si, com para onde ir vê-los. É o que separa um portfólio de um
+ * currículo: aqui o nome do produto é um link, não uma linha numa lista.
+ *
+ * Sem link público e sem galeria, o cartão aparece sem botão — melhor não ter
+ * para onde ir do que mandar o visitante para o lugar errado.
+ */
+export const products: Product[] = [
+  {
+    id: "pontogo",
+    name: "PontoGO",
+    role: "Back end, integrations and the employee app",
+    summary:
+      "Time and attendance for Brazilian companies: employees clock in from the phone — offline too — request adjustments, attach documents and follow their hour balance in real time.",
+    stack: ["Go", "React Native", "PostgreSQL", "Docker"],
+    accent: "#4ac8ff",
+    links: [
+      { label: "pontogo.com.br", url: "https://pontogo.com.br/", kind: "site" },
+      {
+        label: "Google Play",
+        url: "https://play.google.com/store/apps/details?id=br.com.pontogo.colaborador",
+        kind: "play",
+      },
+    ],
+  },
+  {
+    id: "meuprocesso",
+    name: "MeuProcesso",
+    role: "Product engineering",
+    summary:
+      "A portal where lawyers publish case updates once and the client follows everything in one place, instead of answering \"any news?\" over WhatsApp all day.",
+    stack: ["Next.js", "Node.js", "PostgreSQL"],
+    accent: "#b04aff",
+    links: [
+      { label: "meuprocessoapp.com.br", url: "https://meuprocessoapp.com.br/", kind: "site" },
+    ],
+  },
+  {
+    id: "peoplenity",
+    name: "PeopleNity",
+    role: "Micro-services and white-label infrastructure",
+    summary:
+      "gRPC between internal services, REST at the edge, and one deploy that serves several brands from the same codebase.",
+    stack: ["Go", "gRPC", "Docker"],
+    accent: "#4affa1",
+    links: [],
+  },
+  {
+    id: "homefly",
+    name: "Homefly",
+    role: "Product engineering",
+    summary: "Product work on the platform and the integrations around it.",
+    stack: ["TypeScript", "Node.js"],
+    accent: "#ffd24a",
+    links: [],
+  },
+  {
+    id: "plannea",
+    name: "Plannea CRM",
+    role: "Founder engineer — the whole stack",
+    summary:
+      "A platform for Brazilian accounting firms. A Go and PostgreSQL API behind a Next.js front end, talking to government web services: filings and legal notices arrive as work a team can actually track.",
+    stack: ["Go", "PostgreSQL", "Next.js", "SEFAZ integrations"],
+    accent: "#ff6b4a",
+    links: [],
+  },
+  {
+    id: "lepus",
+    name: "Lepus",
+    role: "Solo project",
+    summary:
+      "A running app in React Native and Expo: background GPS, route drawing, pace and elevation splits, offline-first storage, and points, levels and achievements on top.",
+    stack: ["React Native", "Expo", "Supabase"],
+    accent: "#ff4a8d",
+    links: [],
+  },
+];
+
 /**
  * As zonas ficam distribuídas em um anel ao redor do ponto de partida (0,0),
  * de forma que qualquer direção que o jogador escolha leve a algum conteúdo.

@@ -71,13 +71,24 @@ solid white on dark, where emphasis comes from contrast) and the coloured bar ac
 top of every card — seven of those read as a theme picker, so the section colour became a
 badge and a dot.
 
+## Showing, not listing
+
+A CV lists product names; a portfolio has to let you go look. `Things I've built` is one
+card per system, and the name carries a link: the live site, the store listing, or — for
+what has no public page — a screenshot gallery that opens over the page (arrow keys and
+Escape work).
+
+The data lives in `products` in [lib/data.ts](lib/data.ts). A product with neither links
+nor shots renders without a call to action on purpose: better no button than a button that
+sends the visitor to the wrong place.
+
 ## Two front doors
 
-`/` is the portfolio as a page — hero, tools, the same dated timeline the gates tell, one
-card per section, contact. `/drive` is the same story as a valley you steer through. The
-written version is the one that answers the door, because most visits are a recruiter in a
-hurry, a weak phone, or someone who just wants to read; the car is one click away, and the
-start screen links back.
+`/` is the portfolio as a page — hero, products, tools, the same dated timeline the gates
+tell, contact. `/drive` is the same story as a valley you steer through. The written
+version answers the door, because most visits are a recruiter in a hurry, a weak phone, or
+someone who just wants to read; the car sits in a pill fixed to the top corner, present the
+whole way down without taking over the opening.
 
 Both read from the same sources — `projects`, `stack` and the career milestones — so they
 cannot drift apart. The written route ships no WebGL: 4 kB against 12.6 kB for the driving
