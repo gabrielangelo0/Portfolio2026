@@ -3,8 +3,8 @@ import { profile } from "@/lib/data";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: `${profile.name} — 3D Portfolio`,
-  description: `Interactive portfolio by ${profile.name}: drive through a 3D scene and explore the work.`,
+  title: `${profile.name} — ${profile.role}`,
+  description: `Portfolio of ${profile.name}: SaaS platforms, mobile apps and automation — with a drivable version of the same story.`,
 };
 
 export const viewport: Viewport = {

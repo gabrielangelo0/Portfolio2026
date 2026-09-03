@@ -71,17 +71,17 @@ solid white on dark, where emphasis comes from contrast) and the coloured bar ac
 top of every card — seven of those read as a theme picker, so the section colour became a
 badge and a dot.
 
-## The plain version
+## Two front doors
 
-Not every visit wants to drive — a recruiter in a hurry, a weak phone, someone who would
-rather just read. `/classic` is the same portfolio as a page: hero, tools, the same dated
-timeline the gates tell, one card per section, and contact. The start screen links to it
-right under the button.
+`/` is the portfolio as a page — hero, tools, the same dated timeline the gates tell, one
+card per section, contact. `/drive` is the same story as a valley you steer through. The
+written version is the one that answers the door, because most visits are a recruiter in a
+hurry, a weak phone, or someone who just wants to read; the car is one click away, and the
+start screen links back.
 
-It reads from the same sources as the 3D world — `projects`, `stack` and the career
-milestones — so the two versions cannot drift apart. It ships no WebGL: 3.5 kB against
-12 kB for the driving route, prerendered as static HTML, which also makes it the version
-search engines actually read.
+Both read from the same sources — `projects`, `stack` and the career milestones — so they
+cannot drift apart. The written route ships no WebGL: 4 kB against 12.6 kB for the driving
+one, prerendered as static HTML, which also makes it the version search engines read.
 
 ## The career track
 
