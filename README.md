@@ -71,6 +71,17 @@ solid white on dark, where emphasis comes from contrast) and the coloured bar ac
 top of every card — seven of those read as a theme picker, so the section colour became a
 badge and a dot.
 
+## Link previews
+
+The share card (LinkedIn, WhatsApp, Slack, X) comes from
+[app/opengraph-image.tsx](app/opengraph-image.tsx): a 1200 × 630 PNG rendered at build time
+with the profile photo, name, role and the products. The Next convention also emits
+`og:image` with width, height and type, and `metadataBase` in the layout makes the URL
+absolute — LinkedIn and WhatsApp silently drop relative images. The earlier card showed a
+broken-image icon because its tags pointed at an `/og.png` that never existed.
+
+LinkedIn caches previews: after a change, re-scrape the URL in its Post Inspector.
+
 ## Showing, not listing
 
 A CV lists product names; a portfolio has to let you go look. `Things I've built` is one

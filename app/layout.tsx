@@ -2,9 +2,31 @@ import type { Metadata, Viewport } from "next";
 import { profile } from "@/lib/data";
 import "./globals.css";
 
+const SITE = "https://portfolio.devfly.net";
+const TITLE = `${profile.name} — ${profile.role}`;
+const DESCRIPTION = `Portfolio of ${profile.name}: SaaS platforms, mobile apps and automation — with a drivable version of the same story.`;
+
 export const metadata: Metadata = {
-  title: `${profile.name} — ${profile.role}`,
-  description: `Portfolio of ${profile.name}: SaaS platforms, mobile apps and automation — with a drivable version of the same story.`,
+  // Base das URLs absolutas: sem ela og:image sai relativa, e LinkedIn e
+  // WhatsApp ignoram imagem que não venha com domínio completo.
+  metadataBase: new URL(SITE),
+  title: TITLE,
+  description: DESCRIPTION,
+  // og:image não é declarada aqui — vem de app/opengraph-image.tsx, que o Next
+  // transforma na meta com largura, altura e tipo corretos
+  openGraph: {
+    type: "website",
+    url: SITE,
+    siteName: profile.name,
+    title: TITLE,
+    description: DESCRIPTION,
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export const viewport: Viewport = {
