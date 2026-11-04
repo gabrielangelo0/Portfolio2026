@@ -77,6 +77,15 @@ export const products: Product[] = [
         kind: "play",
       },
     ],
+    shots: [
+      { src: "/shots/pontogo/before-login.png", alt: "PontoGO login screen before the redesign" },
+      { src: "/shots/pontogo/before-home.png", alt: "PontoGO home screen before the redesign" },
+      { src: "/shots/pontogo/login.png", alt: "PontoGO login screen after the redesign" },
+      { src: "/shots/pontogo/home.png", alt: "PontoGO home screen after the redesign" },
+      { src: "/shots/pontogo/home-confirm.png", alt: "PontoGO clock-in confirmation" },
+      { src: "/shots/pontogo/requests.png", alt: "PontoGO time adjustment requests" },
+      { src: "/shots/pontogo/menu.png", alt: "PontoGO profile and settings menu" },
+    ],
   },
   {
     id: "meuprocesso",
