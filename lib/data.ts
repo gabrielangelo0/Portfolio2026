@@ -108,6 +108,11 @@ export const products: Product[] = [
     stack: ["TypeScript", "Node.js"],
     accent: "#ffd24a",
     links: [],
+    shots: [
+      { src: "/shots/homefly/login.jpg", alt: "Homefly login screen" },
+      { src: "/shots/homefly/dashboard.jpg", alt: "Homefly sales dashboard" },
+      { src: "/shots/homefly/login-dark.jpg", alt: "Homefly login screen in dark mode" },
+    ],
   },
   {
     id: "plannea",
