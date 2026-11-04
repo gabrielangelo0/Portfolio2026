@@ -13,7 +13,7 @@ import { profile } from "@/lib/data";
  */
 // imagem gerada uma vez, no build — fica em inglês independente do idioma
 // escolhido pelo visitante
-export const alt = `${profile.name} — ${profile.role.en}`;
+export const alt = `${profile.name} | ${profile.role.en}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -90,7 +90,7 @@ export default async function OpengraphImage() {
             PontoGO · MeuProcesso · PeopleNity · Homefly
           </div>
           <div style={{ display: "flex", marginTop: 12, fontSize: 22, color: "#ff7a5c" }}>
-            portfolio.devfly.net
+            gabriel.devfly.net
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@ import { profile } from "@/lib/data";
 import { HomeContent } from "./HomeContent";
 
 export const metadata: Metadata = {
-  title: `${profile.name} — ${profile.role.en}`,
+  title: `${profile.name} | ${profile.role.en}`,
   description:
     "SaaS platforms, mobile apps and automation. The same portfolio as the 3D version, in plain text.",
 };

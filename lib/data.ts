@@ -15,7 +15,10 @@ export type Project = {
 
 export const profile = {
   name: "Gabriel Angelo",
-  role: { en: "Software Engineer · SaaS & Automation", pt: "Engenheiro de Software · SaaS & Automação" },
+  role: {
+    en: "Software Engineer · SaaS, Automation & AI",
+    pt: "Engenheiro de Software · SaaS, Automação & IA",
+  },
   tagline: {
     en: "Drive around the portfolio — WASD or the arrow keys.",
     pt: "Dirija pelo portfólio — WASD ou as setas.",

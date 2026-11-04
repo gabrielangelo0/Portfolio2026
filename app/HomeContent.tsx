@@ -122,7 +122,7 @@ export function HomeContent() {
           </div>
 
           <p className="reader__lead">
-            {profile.name} — {t(profile.role).toLowerCase()}. {t(UI.leadIntro)}
+            {profile.name}, {t(profile.role).toLowerCase()}. {t(UI.leadIntro)}
             <strong>PontoGO, PeopleNity, Homefly</strong>
             {t(UI.leadMid)}
             <strong>MeuProcesso</strong>
