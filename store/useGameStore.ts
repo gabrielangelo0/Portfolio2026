@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { SECRETS, type SecretKind } from "@/lib/secrets";
+import type { Localized } from "@/lib/i18n";
+import { SECRET_FOUND_EYEBROW, SECRETS, type SecretKind } from "@/lib/secrets";
 
 type GameState = {
   started: boolean;
@@ -21,8 +22,8 @@ type GameState = {
   foundSecrets: SecretKind[];
   findSecret: (id: SecretKind) => void;
   /** Aviso passageiro no canto — segredo achado, código secreto digitado. */
-  notice: { eyebrow: string; title: string; message: string; nonce: number } | null;
-  notify: (notice: { eyebrow: string; title: string; message: string }) => void;
+  notice: { eyebrow: Localized; title: Localized; message: Localized; nonce: number } | null;
+  notify: (notice: { eyebrow: Localized; title: Localized; message: Localized }) => void;
   /** Pedido de confete em um ponto do mundo; o emissor é um só. */
   celebration: { x: number; y: number; z: number; nonce: number } | null;
   celebrate: (x: number, y: number, z: number) => void;
@@ -57,7 +58,7 @@ export const useGameStore = create<GameState>((set) => ({
         foundSecrets,
         notice: secret
           ? {
-              eyebrow: "Secret found",
+              eyebrow: SECRET_FOUND_EYEBROW,
               title: secret.title,
               message: secret.message,
               nonce: (s.notice?.nonce ?? 0) + 1,

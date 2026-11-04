@@ -13,8 +13,10 @@ import {
   TRACK_WIDTH,
   trackPointAt,
 } from "@/lib/career";
+import type { Localized } from "@/lib/i18n";
 import { terrainHeight } from "@/lib/terrain";
 import { useGameStore } from "@/store/useGameStore";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 
 const POST = "#6c4a2e";
 
@@ -127,10 +129,11 @@ function MilestoneGate({
 }: {
   at: number;
   year: string;
-  title: string;
-  detail: string;
+  title: Localized;
+  detail: Localized;
   accent: string;
 }) {
+  const { t } = useLanguage();
   const { position, rotation, ground } = useMemo(() => {
     const point = trackPointAt(at);
     return {
@@ -166,8 +169,8 @@ function MilestoneGate({
       <Html position={[0, 4.5, 0]} center distanceFactor={9} zIndexRange={[18, 0]}>
         <div className="milestone" style={{ ["--accent" as string]: accent }}>
           <span className="milestone__year">{year}</span>
-          <span className="milestone__title">{title}</span>
-          <span className="milestone__detail">{detail}</span>
+          <span className="milestone__title">{t(title)}</span>
+          <span className="milestone__detail">{t(detail)}</span>
         </div>
       </Html>
     </group>
@@ -219,6 +222,7 @@ function FinishLine() {
 
   const armed = useRef(true);
   const celebrate = useGameStore((state) => state.celebrate);
+  const { t } = useLanguage();
 
   const half = TRACK_WIDTH / 2 + 1;
 
@@ -263,9 +267,9 @@ function FinishLine() {
 
       <Html position={[0, 6, 0]} center distanceFactor={11} zIndexRange={[18, 0]}>
         <div className="milestone is-finish">
-          <span className="milestone__year">{FINISH.year}</span>
-          <span className="milestone__title">{FINISH.title}</span>
-          <span className="milestone__detail">{FINISH.detail}</span>
+          <span className="milestone__year">{t(FINISH.year)}</span>
+          <span className="milestone__title">{t(FINISH.title)}</span>
+          <span className="milestone__detail">{t(FINISH.detail)}</span>
         </div>
       </Html>
     </group>

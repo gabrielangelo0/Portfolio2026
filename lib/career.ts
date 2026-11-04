@@ -41,12 +41,14 @@ const CONTROL: [number, number][] = [
   [-43.5, -4],
 ];
 
+import type { Localized } from "./i18n";
+
 export type Milestone = {
   /** Posição ao longo da pista, de 0 (largada) a 1 (chegada). */
   at: number;
   year: string;
-  title: string;
-  detail: string;
+  title: Localized;
+  detail: Localized;
 };
 
 /**
@@ -57,49 +59,67 @@ export const MILESTONES: Milestone[] = [
   {
     at: 0.11,
     year: "2012",
-    title: "First lines of code",
-    detail:
-      "Java. Algorithms, objects, and the first real sense that software is built, not found.",
+    title: { en: "First lines of code", pt: "Primeiras linhas de código" },
+    detail: {
+      en: "Java. Algorithms, objects, and the first real sense that software is built, not found.",
+      pt: "Java. Algoritmos, objetos, e a primeira noção de verdade de que software se constrói, não se encontra.",
+    },
   },
   {
     at: 0.23,
     year: "2015",
-    title: "The web calls",
-    detail: "PHP. Forms, databases, and pages that finally did something.",
+    title: { en: "The web calls", pt: "A web chama" },
+    detail: {
+      en: "PHP. Forms, databases, and pages that finally did something.",
+      pt: "PHP. Formulários, banco de dados, e páginas que finalmente faziam alguma coisa.",
+    },
   },
   {
     at: 0.36,
     year: "2020",
-    title: "Front end for real",
-    detail:
-      "HTML, CSS and JavaScript. The interface stops being a detail and becomes the craft.",
+    title: { en: "Front end for real", pt: "Front end de verdade" },
+    detail: {
+      en: "HTML, CSS and JavaScript. The interface stops being a detail and becomes the craft.",
+      pt: "HTML, CSS e JavaScript. A interface deixa de ser detalhe e vira o ofício.",
+    },
   },
   {
     at: 0.48,
     year: "2021",
-    title: "Paid to code",
-    detail: "First job as a developer — production code, deadlines and code review.",
+    title: { en: "Paid to code", pt: "Pago para programar" },
+    detail: {
+      en: "First job as a developer — production code, deadlines and code review.",
+      pt: "Primeiro emprego como desenvolvedor — código em produção, prazo e code review.",
+    },
   },
   {
-    at: 0.60,
+    at: 0.6,
     year: "2024",
-    title: "Skin in the game",
-    detail: "Partner in a startup: building the product and carrying the outcome.",
+    title: { en: "Skin in the game", pt: "Com o próprio pescoço em jogo" },
+    detail: {
+      en: "Partner in a startup: building the product and carrying the outcome.",
+      pt: "Sócio numa startup: construindo o produto e carregando o resultado.",
+    },
   },
   {
     at: 0.72,
     year: "2025",
-    title: "Passing it on",
-    detail: "Full stack instructor at Digital College, teaching new cohorts to ship.",
+    title: { en: "Passing it on", pt: "Passando adiante" },
+    detail: {
+      en: "Full stack instructor at Digital College, teaching new cohorts to ship.",
+      pt: "Instrutor full stack na Digital College, ensinando novas turmas a colocar no ar.",
+    },
   },
 ];
 
 /** O que está escrito na chegada, no alto da serra. */
 export const FINISH = {
-  year: "Today",
-  title: "Still driving",
-  detail:
-    "SaaS, mobile and automation in production — PontoGO, PeopleNity, Homefly and MeuProcesso.",
+  year: { en: "Today", pt: "Hoje" },
+  title: { en: "Still driving", pt: "Ainda dirigindo" },
+  detail: {
+    en: "SaaS, mobile and automation in production — PontoGO, PeopleNity, Homefly and MeuProcesso.",
+    pt: "SaaS, mobile e automação em produção — PontoGO, PeopleNity, Homefly e MeuProcesso.",
+  },
 };
 
 // ---------------------------------------------------------------- a curva

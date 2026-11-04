@@ -3,15 +3,22 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { products, type Product } from "@/lib/data";
+import type { Localized } from "@/lib/i18n";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 
 /** Ícone curto por tipo de link, para o botão dizer para onde vai sem legenda. */
-const KIND_LABEL: Record<string, string> = {
-  site: "Visit",
-  app: "Open app",
-  play: "Google Play",
-  appstore: "App Store",
-  repo: "Code",
+const KIND_LABEL: Record<string, Localized> = {
+  site: { en: "Visit", pt: "Visitar" },
+  app: { en: "Open app", pt: "Abrir app" },
+  play: { en: "Google Play", pt: "Google Play" },
+  appstore: { en: "App Store", pt: "App Store" },
+  repo: { en: "Code", pt: "Código" },
 };
+const OPEN_FALLBACK: Localized = { en: "Open", pt: "Abrir" };
+const CLOSE: Localized = { en: "Close", pt: "Fechar" };
+const SCREENSHOTS: Localized = { en: "Screenshots", pt: "Capturas de tela" };
+const PREV_SCREENSHOT: Localized = { en: "Previous screenshot", pt: "Captura anterior" };
+const NEXT_SCREENSHOT: Localized = { en: "Next screenshot", pt: "Próxima captura" };
 
 /**
  * Esquenta o cache do navegador para essas URLs sem renderizar nada — só
@@ -31,6 +38,7 @@ function preload(srcs: string[]) {
 function Gallery({ product, onClose }: { product: Product; onClose: () => void }) {
   const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState<Record<string, boolean>>({});
+  const { t } = useLanguage();
   const shots = product.shots ?? [];
 
   const move = useCallback(
@@ -63,7 +71,7 @@ function Gallery({ product, onClose }: { product: Product; onClose: () => void }
     <Image
       key={shot.src}
       src={shot.src}
-      alt={shot.alt}
+      alt={t(shot.alt)}
       width={1200}
       height={900}
       sizes="(max-width: 820px) 92vw, 760px"
@@ -75,23 +83,28 @@ function Gallery({ product, onClose }: { product: Product; onClose: () => void }
   );
 
   return (
-    <div className="lightbox" role="dialog" aria-modal aria-label={`${product.name} screenshots`}>
-      <button className="lightbox__backdrop" onClick={onClose} aria-label="Close" />
+    <div
+      className="lightbox"
+      role="dialog"
+      aria-modal
+      aria-label={`${product.name} ${t(SCREENSHOTS).toLowerCase()}`}
+    >
+      <button className="lightbox__backdrop" onClick={onClose} aria-label={t(CLOSE)} />
 
       <div className="lightbox__panel glass">
         <header className="lightbox__head">
           <div>
             <h3>{product.name}</h3>
-            <p>{product.role}</p>
+            <p>{t(product.role)}</p>
           </div>
-          <button className="lightbox__close" onClick={onClose} aria-label="Close">
+          <button className="lightbox__close" onClick={onClose} aria-label={t(CLOSE)}>
             ✕
           </button>
         </header>
 
         <div className="lightbox__stage">
           {!isLoaded ? <span className="lightbox__spinner" aria-hidden /> : null}
-          {shot.caption ? <span className="lightbox__caption">{shot.caption}</span> : null}
+          {shot.caption ? <span className="lightbox__caption">{t(shot.caption)}</span> : null}
           {/* eager: a galeria só monta quando alguém abre, e o lazy padrão
               deixava o palco preto esperando um observador que nunca dispara.
               shot.frame marca captura crua, sem moldura — a própria captura
@@ -112,13 +125,13 @@ function Gallery({ product, onClose }: { product: Product; onClose: () => void }
 
         {shots.length > 1 ? (
           <footer className="lightbox__foot">
-            <button onClick={() => move(-1)} aria-label="Previous screenshot">
+            <button onClick={() => move(-1)} aria-label={t(PREV_SCREENSHOT)}>
               ←
             </button>
             <span>
               {index + 1} / {shots.length}
             </span>
-            <button onClick={() => move(1)} aria-label="Next screenshot">
+            <button onClick={() => move(1)} aria-label={t(NEXT_SCREENSHOT)}>
               →
             </button>
           </footer>
@@ -130,6 +143,7 @@ function Gallery({ product, onClose }: { product: Product; onClose: () => void }
 
 export function Products() {
   const [open, setOpen] = useState<Product | null>(null);
+  const { t } = useLanguage();
 
   // com a galeria aberta, o fundo não pode rolar por baixo
   useEffect(() => {
@@ -155,9 +169,9 @@ export function Products() {
               ["--delay" as string]: `${index * 0.06}s`,
             }}
           >
-            <p className="card__badge">{product.role}</p>
+            <p className="card__badge">{t(product.role)}</p>
             <h3 className="card__title">{product.name}</h3>
-            <p className="card__description">{product.summary}</p>
+            <p className="card__description">{t(product.summary)}</p>
 
             <ul className="card__stack">
               {product.stack.map((tech) => (
@@ -174,7 +188,7 @@ export function Products() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {KIND_LABEL[link.kind] ?? "Open"} ↗
+                  {t(KIND_LABEL[link.kind] ?? OPEN_FALLBACK)} ↗
                 </a>
               ))}
 
@@ -185,7 +199,7 @@ export function Products() {
                   onMouseEnter={() => preload(product.shots!.map((item) => item.src))}
                   onFocus={() => preload(product.shots!.map((item) => item.src))}
                 >
-                  Screenshots
+                  {t(SCREENSHOTS)}
                 </button>
               ) : null}
             </div>

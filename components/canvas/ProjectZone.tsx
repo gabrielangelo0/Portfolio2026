@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
 import * as THREE from "three";
+import { useLanguage } from "@/components/ui/LanguageProvider";
 import type { Project } from "@/lib/data";
 import { useGameStore } from "@/store/useGameStore";
 
@@ -12,6 +13,7 @@ export function ProjectZone({ project }: { project: Project }) {
   const ringRef = useRef<THREE.Mesh>(null);
   const beamRef = useRef<THREE.Mesh>(null);
   const active = useGameStore((s) => s.activeZone === project.id);
+  const { t } = useLanguage();
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
@@ -71,8 +73,8 @@ export function ProjectZone({ project }: { project: Project }) {
 
       <Html position={[0, 3.6, 0]} center distanceFactor={18} zIndexRange={[20, 0]}>
         <div className={`zone-label ${active ? "is-active" : ""}`} style={{ ["--zone" as string]: project.color }}>
-          <span className="zone-label__title">{project.title}</span>
-          <span className="zone-label__subtitle">{project.subtitle}</span>
+          <span className="zone-label__title">{t(project.title)}</span>
+          <span className="zone-label__subtitle">{t(project.subtitle)}</span>
         </div>
       </Html>
     </group>

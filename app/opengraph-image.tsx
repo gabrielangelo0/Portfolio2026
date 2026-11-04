@@ -11,7 +11,9 @@ import { profile } from "@/lib/data";
  *
  * 1200 × 630 é o formato que LinkedIn e X esperam para o card grande.
  */
-export const alt = `${profile.name} — ${profile.role}`;
+// imagem gerada uma vez, no build — fica em inglês independente do idioma
+// escolhido pelo visitante
+export const alt = `${profile.name} — ${profile.role.en}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -75,7 +77,7 @@ export default async function OpengraphImage() {
             {profile.name}
           </div>
           <div style={{ fontSize: 34, marginTop: 14, color: "rgba(245, 245, 247, 0.78)" }}>
-            {profile.role}
+            {profile.role.en}
           </div>
           <div
             style={{

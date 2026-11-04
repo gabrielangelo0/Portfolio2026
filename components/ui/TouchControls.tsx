@@ -2,8 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { input } from "@/lib/controls";
+import type { Localized } from "@/lib/i18n";
+import { useLanguage } from "./LanguageProvider";
 
 const DEAD_ZONE = 0.12;
+
+const STEERING_LABEL: Localized = { en: "Steering", pt: "Direção" };
+const REVERSE_HINT: Localized = { en: "Reverse", pt: "Ré" };
+const THROTTLE_HINT: Localized = { en: "Throttle", pt: "Acelerar" };
 
 /** A captura falha para ponteiros que o navegador não conhece; o controle segue válido. */
 function capturePointer(element: Element, pointerId: number) {
@@ -24,6 +30,7 @@ function SteeringStick() {
   const base = useRef<HTMLDivElement>(null);
   const knob = useRef<HTMLDivElement>(null);
   const activePointer = useRef<number | null>(null);
+  const { t } = useLanguage();
 
   const applyDirection = useCallback((x: number) => {
     const value = Math.abs(x) < DEAD_ZONE ? 0 : Math.max(-1, Math.min(1, x));
@@ -71,7 +78,7 @@ function SteeringStick() {
       onPointerUp={end}
       onPointerCancel={end}
       role="slider"
-      aria-label="Steering"
+      aria-label={t(STEERING_LABEL)}
       aria-valuemin={-1}
       aria-valuemax={1}
       aria-valuenow={0}
@@ -86,11 +93,12 @@ function SteeringStick() {
 type PedalProps = {
   action: "throttle" | "reverse";
   label: string;
-  hint: string;
+  hint: Localized;
   className: string;
 };
 
 function Pedal({ action, label, hint, className }: PedalProps) {
+  const { t } = useLanguage();
   const press = (value: number) => (event: React.PointerEvent<HTMLButtonElement>) => {
     if (value) capturePointer(event.currentTarget, event.pointerId);
     input[action] = value;
@@ -103,10 +111,10 @@ function Pedal({ action, label, hint, className }: PedalProps) {
       onPointerUp={press(0)}
       onPointerCancel={press(0)}
       onContextMenu={(event) => event.preventDefault()}
-      aria-label={hint}
+      aria-label={t(hint)}
     >
       <span className="pedal__label">{label}</span>
-      <span className="pedal__hint">{hint}</span>
+      <span className="pedal__hint">{t(hint)}</span>
     </button>
   );
 }
@@ -124,8 +132,8 @@ export function TouchControls() {
     <>
       <SteeringStick />
       <div className="pedals">
-        <Pedal action="reverse" label="R" hint="Reverse" className="pedal--reverse" />
-        <Pedal action="throttle" label="▲" hint="Throttle" className="pedal--throttle" />
+        <Pedal action="reverse" label="R" hint={REVERSE_HINT} className="pedal--reverse" />
+        <Pedal action="throttle" label="▲" hint={THROTTLE_HINT} className="pedal--throttle" />
       </div>
     </>
   );

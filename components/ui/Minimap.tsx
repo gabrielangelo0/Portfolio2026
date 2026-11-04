@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { carState } from "@/lib/carState";
 import { TRACK, TRACK_WIDTH, trackPointAt } from "@/lib/career";
 import { projects } from "@/lib/data";
+import type { Localized } from "@/lib/i18n";
 import {
   ARENA,
   CRATE_STACKS,
@@ -15,6 +16,21 @@ import {
   generateScenery,
 } from "@/lib/world";
 import { useGameStore } from "@/store/useGameStore";
+import { useLanguage } from "./LanguageProvider";
+
+const UI: Record<string, Localized> = {
+  openMap: { en: "Open the map (M)", pt: "Abrir o mapa (M)" },
+  mapBadge: { en: "Map · M", pt: "Mapa · M" },
+  mapTitle: { en: "Map", pt: "Mapa" },
+  closeMap: { en: "Close the map", pt: "Fechar o mapa" },
+  start: { en: "start", pt: "largada" },
+  hint: {
+    en: "Click a section to drive straight there",
+    pt: "Clique numa seção para ir direto até lá",
+  },
+  or: { en: "or", pt: "ou" },
+  closes: { en: "closes", pt: "fecha" },
+};
 
 const RADIUS_METERS = 34; // quanto do mundo cabe no minimapa
 const SIZE = 170; // lado do canvas, em CSS pixels
@@ -27,6 +43,7 @@ const SIZE = 170; // lado do canvas, em CSS pixels
 export function Minimap({ onExpand }: { onExpand: () => void }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const scenery = useMemo(() => generateScenery(), []);
+  const { t } = useLanguage();
 
   const draw = useCallback(
     (ctx: CanvasRenderingContext2D) => {
@@ -223,9 +240,9 @@ export function Minimap({ onExpand }: { onExpand: () => void }) {
   }, [draw]);
 
   return (
-    <button className="minimap" onClick={onExpand} title="Open the map (M)">
+    <button className="minimap" onClick={onExpand} title={t(UI.openMap)}>
       <canvas ref={canvas} style={{ width: SIZE, height: SIZE }} />
-      <span className="minimap__badge">Map · M</span>
+      <span className="minimap__badge">{t(UI.mapBadge)}</span>
     </button>
   );
 }
@@ -235,6 +252,7 @@ export function WorldMap({ onClose }: { onClose: () => void }) {
   const goToZone = useGameStore((s) => s.goToZone);
   const activeZone = useGameStore((s) => s.activeZone);
   const [pose, setPose] = useState({ x: carState.x, z: carState.z, yaw: carState.yaw });
+  const { t } = useLanguage();
 
   useEffect(() => {
     const id = window.setInterval(
@@ -259,8 +277,8 @@ export function WorldMap({ onClose }: { onClose: () => void }) {
     <div className="worldmap" onClick={onClose}>
       <div className="worldmap__panel" onClick={(event) => event.stopPropagation()}>
         <header className="worldmap__header">
-          <h2>Map</h2>
-          <button className="worldmap__close" onClick={onClose} aria-label="Close the map">
+          <h2>{t(UI.mapTitle)}</h2>
+          <button className="worldmap__close" onClick={onClose} aria-label={t(UI.closeMap)}>
             ✕
           </button>
         </header>
@@ -270,7 +288,7 @@ export function WorldMap({ onClose }: { onClose: () => void }) {
             className="worldmap__start"
             style={{ left: `${toPercent(START_PAD.x)}%`, top: `${toPercent(START_PAD.z)}%` }}
           >
-            start
+            {t(UI.start)}
           </div>
 
           {projects.map((project) => (
@@ -288,7 +306,7 @@ export function WorldMap({ onClose }: { onClose: () => void }) {
               }}
             >
               <i />
-              {project.title}
+              {t(project.title)}
             </button>
           ))}
 
@@ -304,7 +322,7 @@ export function WorldMap({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="worldmap__hint">
-          Click a section to drive straight there · <kbd>M</kbd> or <kbd>Esc</kbd> closes
+          {t(UI.hint)} · <kbd>M</kbd> {t(UI.or)} <kbd>Esc</kbd> {t(UI.closes)}
         </p>
       </div>
     </div>

@@ -6,14 +6,54 @@ import { audio } from "@/lib/audio";
 import { carState } from "@/lib/carState";
 import { terrainHeight } from "@/lib/terrain";
 import { profile, projects } from "@/lib/data";
+import type { Localized } from "@/lib/i18n";
 import { SECRETS } from "@/lib/secrets";
 import { useGameStore } from "@/store/useGameStore";
+import { useLanguage } from "./LanguageProvider";
 import { Minimap, WorldMap } from "./Minimap";
 import { TouchControls } from "./TouchControls";
+
+const UI: Record<string, Localized> = {
+  interactivePortfolio: { en: "Interactive portfolio", pt: "Portfólio interativo" },
+  soundOn: {
+    en: "Sound on — you can mute it anytime. Six things are hidden out in the hills.",
+    pt: "Som ligado — você pode silenciar quando quiser. Seis coisas estão escondidas pela serra.",
+  },
+  getInTheCar: { en: "Get in the car", pt: "Entrar no carro" },
+  backToWritten: { en: "← Back to the written portfolio", pt: "← Voltar para a versão em página" },
+  throttleReverse: { en: "throttle and reverse", pt: "acelerar e ré" },
+  steer: { en: "steer", pt: "dirigir" },
+  brake: { en: "brake", pt: "freio" },
+  backToStart: { en: "back to start", pt: "voltar à largada" },
+  map: { en: "map", pt: "mapa" },
+  email: { en: "Email", pt: "E-mail" },
+  unmute: { en: "Unmute", pt: "Reativar som" },
+  mute: { en: "Mute", pt: "Silenciar" },
+  sound: { en: "sound", pt: "som" },
+  restart: { en: "Restart", pt: "Reiniciar" },
+  viewMore: { en: "View more →", pt: "Ver mais →" },
+  youMadeIt: { en: "You made it", pt: "Você chegou" },
+  driveToCircle: {
+    en: "Drive to one of the colored circles",
+    pt: "Dirija até um dos círculos coloridos",
+  },
+  jumpStraightTo: { en: "Jump straight to", pt: "Ir direto para" },
+  jumpToFinish: { en: "Jump to the finish line", pt: "Ir direto para a linha de chegada" },
+  finishLine: { en: "Finish line", pt: "Linha de chegada" },
+  clickToJump: { en: "click to jump", pt: "clique para ir até lá" },
+  allSecretsFound: { en: "all secrets found", pt: "todos os segredos encontrados" },
+  secretsFound: { en: "secrets found", pt: "segredos encontrados" },
+  konamiTitle: { en: "Konami code", pt: "Código Konami" },
+  konamiMessage: {
+    en: "Thirty lives not included. The confetti is on the house.",
+    pt: "Trinta vidas não inclusas. O confete é por nossa conta.",
+  },
+};
 
 function Intro() {
   const start = useGameStore((s) => s.start);
   const muted = useGameStore((s) => s.muted);
+  const { t } = useLanguage();
 
   const enter = () => {
     // O áudio nunca pode impedir a entrada: a política de autoplay exige que o
@@ -40,38 +80,36 @@ function Intro() {
             priority
           />
         </div>
-        <p className="intro__eyebrow">Interactive portfolio</p>
+        <p className="intro__eyebrow">{t(UI.interactivePortfolio)}</p>
         <h1 className="intro__name">{profile.name}</h1>
-        <p className="intro__role">{profile.role}</p>
-        <p className="intro__tagline">{profile.tagline}</p>
-        <p className="intro__sound">
-          Sound on — you can mute it anytime. Six things are hidden out in the hills.
-        </p>
+        <p className="intro__role">{t(profile.role)}</p>
+        <p className="intro__tagline">{t(profile.tagline)}</p>
+        <p className="intro__sound">{t(UI.soundOn)}</p>
 
         <button className="intro__button" onClick={enter} autoFocus>
-          Get in the car
+          {t(UI.getInTheCar)}
         </button>
 
         {/* volta para a porta de entrada, que é a versão em página */}
         <a className="intro__alt" href="/">
-          ← Back to the written portfolio
+          {t(UI.backToWritten)}
         </a>
 
         <ul className="intro__keys">
           <li>
-            <kbd>W</kbd> <kbd>S</kbd> throttle and reverse
+            <kbd>W</kbd> <kbd>S</kbd> {t(UI.throttleReverse)}
           </li>
           <li>
-            <kbd>A</kbd> <kbd>D</kbd> steer
+            <kbd>A</kbd> <kbd>D</kbd> {t(UI.steer)}
           </li>
           <li>
-            <kbd>Space</kbd> brake
+            <kbd>Space</kbd> {t(UI.brake)}
           </li>
           <li>
-            <kbd>R</kbd> back to start
+            <kbd>R</kbd> {t(UI.backToStart)}
           </li>
           <li>
-            <kbd>M</kbd> map
+            <kbd>M</kbd> {t(UI.map)}
           </li>
         </ul>
 
@@ -84,7 +122,7 @@ function Intro() {
             </li>
           ))}
           <li>
-            <a href={`mailto:${profile.email}`}>Email</a>
+            <a href={`mailto:${profile.email}`}>{t(UI.email)}</a>
           </li>
         </ul>
       </div>
@@ -97,6 +135,7 @@ function Hud() {
   const reset = useGameStore((s) => s.reset);
   const muted = useGameStore((s) => s.muted);
   const toggleMuted = useGameStore((s) => s.toggleMuted);
+  const { t } = useLanguage();
   const kmh = Math.round(speed * 6);
 
   return (
@@ -110,12 +149,12 @@ function Hud() {
           className="hud__reset"
           onClick={toggleMuted}
           aria-pressed={muted}
-          title={muted ? "Unmute" : "Mute"}
+          title={t(muted ? UI.unmute : UI.mute)}
         >
-          {muted ? "🔇" : "🔊"} sound
+          {muted ? "🔇" : "🔊"} {t(UI.sound)}
         </button>
         <button className="hud__reset" onClick={reset}>
-          Restart <kbd>R</kbd>
+          {t(UI.restart)} <kbd>R</kbd>
         </button>
       </div>
     </div>
@@ -125,14 +164,15 @@ function Hud() {
 function ProjectPanel() {
   const activeZone = useGameStore((s) => s.activeZone);
   const project = projects.find((p) => p.id === activeZone);
+  const { t } = useLanguage();
 
   return (
     <div className={`panel ${project ? "is-open" : ""}`} aria-hidden={!project}>
       {project && (
         <div className="panel__inner" style={{ ["--zone" as string]: project.color }}>
-          <p className="panel__subtitle">{project.subtitle}</p>
-          <h2 className="panel__title">{project.title}</h2>
-          <p className="panel__description">{project.description}</p>
+          <p className="panel__subtitle">{t(project.subtitle)}</p>
+          <h2 className="panel__title">{t(project.title)}</h2>
+          <p className="panel__description">{t(project.description)}</p>
           <ul className="panel__stack">
             {project.stack.map((tech) => (
               <li key={tech}>{tech}</li>
@@ -157,7 +197,7 @@ function ProjectPanel() {
             </div>
           ) : project.url ? (
             <a className="panel__link" href={project.url} target="_blank" rel="noreferrer">
-              View more →
+              {t(UI.viewMore)}
             </a>
           ) : null}
         </div>
@@ -169,11 +209,12 @@ function ProjectPanel() {
 function Compass() {
   const activeZone = useGameStore((s) => s.activeZone);
   const goToZone = useGameStore((s) => s.goToZone);
+  const { t } = useLanguage();
 
   return (
     <nav className="compass">
       <span className="compass__hint">
-        {activeZone ? "You made it" : "Drive to one of the colored circles"}
+        {t(activeZone ? UI.youMadeIt : UI.driveToCircle)}
       </span>
       <ul>
         {projects.map((p) => (
@@ -181,10 +222,10 @@ function Compass() {
             <button
               className={activeZone === p.id ? "is-active" : ""}
               onClick={() => goToZone(p.id)}
-              title={`Jump straight to ${p.title}`}
+              title={`${t(UI.jumpStraightTo)} ${t(p.title)}`}
             >
               <i style={{ background: p.color }} />
-              {p.title}
+              {t(p.title)}
             </button>
           </li>
         ))}
@@ -192,14 +233,14 @@ function Compass() {
           <button
             className="is-finish"
             onClick={() => goToZone("finish")}
-            title="Jump to the finish line"
+            title={t(UI.jumpToFinish)}
           >
             <i className="compass__flag" />
-            Finish line
+            {t(UI.finishLine)}
           </button>
         </li>
       </ul>
-      <span className="compass__note">click to jump</span>
+      <span className="compass__note">{t(UI.clickToJump)}</span>
     </nav>
   );
 }
@@ -210,6 +251,7 @@ function Compass() {
  */
 function SecretTally() {
   const found = useGameStore((s) => s.foundSecrets);
+  const { t } = useLanguage();
   if (found.length === 0) return null;
 
   return (
@@ -218,7 +260,7 @@ function SecretTally() {
         {found.length}/{SECRETS.length}
       </span>
       <span className="tally__label">
-        {found.length === SECRETS.length ? "all secrets found" : "secrets found"}
+        {t(found.length === SECRETS.length ? UI.allSecretsFound : UI.secretsFound)}
       </span>
     </div>
   );
@@ -228,6 +270,7 @@ function SecretTally() {
 function Toast() {
   const notice = useGameStore((s) => s.notice);
   const [visible, setVisible] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!notice) return;
@@ -240,9 +283,9 @@ function Toast() {
 
   return (
     <div className={`toast ${visible ? "is-open" : ""}`}>
-      <span className="toast__eyebrow">{notice.eyebrow}</span>
-      <strong className="toast__title">{notice.title}</strong>
-      <span className="toast__message">{notice.message}</span>
+      <span className="toast__eyebrow">{t(notice.eyebrow)}</span>
+      <strong className="toast__title">{t(notice.title)}</strong>
+      <span className="toast__message">{t(notice.message)}</span>
     </div>
   );
 }
@@ -295,9 +338,9 @@ export function Overlay() {
     const { celebrate, notify } = useGameStore.getState();
     celebrate(carState.x, terrainHeight(carState.x, carState.z) + 4, carState.z);
     notify({
-      eyebrow: "↑ ↑ ↓ ↓ ← → ← → B A",
-      title: "Konami code",
-      message: "Thirty lives not included. The confetti is on the house.",
+      eyebrow: { en: "↑ ↑ ↓ ↓ ← → ← → B A", pt: "↑ ↑ ↓ ↓ ← → ← → B A" },
+      title: UI.konamiTitle,
+      message: UI.konamiMessage,
     });
     try {
       audio.finish();

@@ -1,10 +1,12 @@
+import type { Localized } from "./i18n";
+
 export type Vec3 = [number, number, number];
 
 export type Project = {
   id: string;
-  title: string;
-  subtitle: string;
-  description: string;
+  title: Localized;
+  subtitle: Localized;
+  description: Localized;
   stack: string[];
   url?: string;
   color: string;
@@ -13,8 +15,11 @@ export type Project = {
 
 export const profile = {
   name: "Gabriel Angelo",
-  role: "Software Engineer · SaaS & Automation",
-  tagline: "Drive around the portfolio — WASD or the arrow keys.",
+  role: { en: "Software Engineer · SaaS & Automation", pt: "Engenheiro de Software · SaaS & Automação" },
+  tagline: {
+    en: "Drive around the portfolio — WASD or the arrow keys.",
+    pt: "Dirija pelo portfólio — WASD ou as setas.",
+  },
   email: "gabrielangelolira@gmail.com",
   links: [
     { label: "GitHub", url: "https://github.com/gabrielangelo0" },
@@ -25,13 +30,26 @@ export const profile = {
 /**
  * Ferramentas do dia a dia, agrupadas por frente de trabalho. A versão em
  * página mostra a lista inteira; o mundo 3D só cabe três ou quatro por seção.
+ * Só o nome do grupo é traduzido — tecnologia é nome próprio.
  */
-export const stack: { group: string; items: string[] }[] = [
-  { group: "Languages", items: ["TypeScript", "JavaScript", "Go", "PHP", "Java"] },
-  { group: "Web", items: ["React", "Next.js", "Node.js", "HeroUI", "Three.js"] },
-  { group: "Mobile", items: ["React Native", "Expo"] },
-  { group: "Data", items: ["PostgreSQL", "Redis", "Supabase", "Firebase"] },
-  { group: "Infra & automation", items: ["Docker", "n8n", "WhatsApp API", "REST integrations"] },
+export const stack: { group: Localized; items: string[] }[] = [
+  {
+    group: { en: "Languages", pt: "Linguagens" },
+    items: ["TypeScript", "JavaScript", "Go", "PHP", "Java"],
+  },
+  {
+    group: { en: "Web", pt: "Web" },
+    items: ["React", "Next.js", "Node.js", "HeroUI", "Three.js"],
+  },
+  { group: { en: "Mobile", pt: "Mobile" }, items: ["React Native", "Expo"] },
+  {
+    group: { en: "Data", pt: "Dados" },
+    items: ["PostgreSQL", "Redis", "Supabase", "Firebase"],
+  },
+  {
+    group: { en: "Infra & automation", pt: "Infra e automação" },
+    items: ["Docker", "n8n", "WhatsApp API", "REST integrations"],
+  },
 ];
 
 export type ProductLink = {
@@ -42,9 +60,9 @@ export type ProductLink = {
 
 export type Shot = {
   src: string;
-  alt: string;
-  /** Legenda curta sobre a imagem, tipo "Antes" / "Depois" de um redesign. */
-  caption?: string;
+  alt: Localized;
+  /** Legenda curta sobre a imagem, tipo "antes" / "depois" de um redesign. */
+  caption?: Localized;
   /** A imagem é a captura de tela crua, sem moldura de aparelho — a galeria desenha uma. */
   frame?: boolean;
 };
@@ -53,14 +71,17 @@ export type Product = {
   id: string;
   name: string;
   /** O que eu fiz nele, não o que o produto faz. */
-  role: string;
-  summary: string;
+  role: Localized;
+  summary: Localized;
   stack: string[];
   accent: string;
   links: ProductLink[];
   /** Galeria, para o que não tem página pública para onde apontar. */
   shots?: Shot[];
 };
+
+const BEFORE: Localized = { en: "Before", pt: "Antes" };
+const AFTER: Localized = { en: "After", pt: "Depois" };
 
 /**
  * Os sistemas em si, com para onde ir vê-los. É o que separa um portfólio de um
@@ -73,9 +94,14 @@ export const products: Product[] = [
   {
     id: "pontogo",
     name: "PontoGO",
-    role: "Back end, integrations and the employee app",
-    summary:
-      "Time and attendance for Brazilian companies: employees clock in from the phone — offline too — request adjustments, attach documents and follow their hour balance in real time.",
+    role: {
+      en: "Back end, integrations and the employee app",
+      pt: "Back end, integrações e o app do colaborador",
+    },
+    summary: {
+      en: "Time and attendance for Brazilian companies: employees clock in from the phone — offline too — request adjustments, attach documents and follow their hour balance in real time.",
+      pt: "Ponto e jornada para empresas brasileiras: o colaborador bate o ponto pelo celular — até offline — pede ajustes, anexa documentos e acompanha o banco de horas em tempo real.",
+    },
     stack: ["Go", "React Native", "PostgreSQL", "Docker"],
     accent: "#4ac8ff",
     links: [
@@ -89,42 +115,57 @@ export const products: Product[] = [
     shots: [
       {
         src: "/shots/pontogo/before-login.png",
-        alt: "PontoGO login screen before the redesign",
-        caption: "Antes",
+        alt: {
+          en: "PontoGO login screen before the redesign",
+          pt: "Tela de login do PontoGO antes do redesign",
+        },
+        caption: BEFORE,
       },
       {
         src: "/shots/pontogo/before-home.png",
-        alt: "PontoGO home screen before the redesign",
-        caption: "Antes",
+        alt: {
+          en: "PontoGO home screen before the redesign",
+          pt: "Tela inicial do PontoGO antes do redesign",
+        },
+        caption: BEFORE,
       },
       {
         src: "/shots/pontogo/login.png",
-        alt: "PontoGO login screen after the redesign",
-        caption: "Depois",
+        alt: {
+          en: "PontoGO login screen after the redesign",
+          pt: "Tela de login do PontoGO depois do redesign",
+        },
+        caption: AFTER,
         frame: true,
       },
       {
         src: "/shots/pontogo/home.png",
-        alt: "PontoGO home screen after the redesign",
-        caption: "Depois",
+        alt: {
+          en: "PontoGO home screen after the redesign",
+          pt: "Tela inicial do PontoGO depois do redesign",
+        },
+        caption: AFTER,
         frame: true,
       },
       {
         src: "/shots/pontogo/home-confirm.png",
-        alt: "PontoGO clock-in confirmation",
-        caption: "Depois",
+        alt: { en: "PontoGO clock-in confirmation", pt: "Confirmação de registro de ponto" },
+        caption: AFTER,
         frame: true,
       },
       {
         src: "/shots/pontogo/requests.png",
-        alt: "PontoGO time adjustment requests",
-        caption: "Depois",
+        alt: {
+          en: "PontoGO time adjustment requests",
+          pt: "Solicitações de ajuste de ponto",
+        },
+        caption: AFTER,
         frame: true,
       },
       {
         src: "/shots/pontogo/menu.png",
-        alt: "PontoGO profile and settings menu",
-        caption: "Depois",
+        alt: { en: "PontoGO profile and settings menu", pt: "Menu de perfil e configurações" },
+        caption: AFTER,
         frame: true,
       },
     ],
@@ -132,9 +173,11 @@ export const products: Product[] = [
   {
     id: "meuprocesso",
     name: "MeuProcesso",
-    role: "Product engineering",
-    summary:
-      "A portal where lawyers publish case updates once and the client follows everything in one place, instead of answering \"any news?\" over WhatsApp all day.",
+    role: { en: "Product engineering", pt: "Engenharia de produto" },
+    summary: {
+      en: 'A portal where lawyers publish case updates once and the client follows everything in one place, instead of answering "any news?" over WhatsApp all day.',
+      pt: 'Um portal onde o advogado publica a atualização do processo uma vez só e o cliente acompanha tudo num só lugar, em vez de responder "alguma novidade?" pelo WhatsApp o dia inteiro.',
+    },
     stack: ["Next.js", "Node.js", "PostgreSQL"],
     accent: "#b04aff",
     links: [
@@ -144,9 +187,14 @@ export const products: Product[] = [
   {
     id: "peoplenity",
     name: "PeopleNity",
-    role: "Micro-services and white-label infrastructure",
-    summary:
-      "gRPC between internal services, REST at the edge, and one deploy that serves several brands from the same codebase.",
+    role: {
+      en: "Micro-services and white-label infrastructure",
+      pt: "Microsserviços e infraestrutura white-label",
+    },
+    summary: {
+      en: "gRPC between internal services, REST at the edge, and one deploy that serves several brands from the same codebase.",
+      pt: "gRPC entre os serviços internos, REST na borda, e um único deploy que atende várias marcas a partir do mesmo código.",
+    },
     stack: ["Go", "gRPC", "Docker"],
     accent: "#4affa1",
     links: [
@@ -157,17 +205,31 @@ export const products: Product[] = [
   {
     id: "homefly",
     name: "Homefly",
-    role: "Product engineering",
-    summary: "Product work on the platform and the integrations around it.",
+    role: { en: "Product engineering", pt: "Engenharia de produto" },
+    summary: {
+      en: "Product work on the platform and the integrations around it.",
+      pt: "Trabalho de produto na plataforma e nas integrações ao redor dela.",
+    },
     stack: ["TypeScript", "Node.js"],
     accent: "#ffd24a",
     links: [],
     shots: [
-      { src: "/shots/homefly/login.jpg", alt: "Homefly login screen", frame: true },
-      { src: "/shots/homefly/dashboard.jpg", alt: "Homefly sales dashboard", frame: true },
+      {
+        src: "/shots/homefly/login.jpg",
+        alt: { en: "Homefly login screen", pt: "Tela de login do Homefly" },
+        frame: true,
+      },
+      {
+        src: "/shots/homefly/dashboard.jpg",
+        alt: { en: "Homefly sales dashboard", pt: "Painel de vendas do Homefly" },
+        frame: true,
+      },
       {
         src: "/shots/homefly/login-dark.jpg",
-        alt: "Homefly login screen in dark mode",
+        alt: {
+          en: "Homefly login screen in dark mode",
+          pt: "Tela de login do Homefly em modo escuro",
+        },
         frame: true,
       },
     ],
@@ -175,9 +237,11 @@ export const products: Product[] = [
   {
     id: "plannea",
     name: "Plannea CRM",
-    role: "Founder engineer — the whole stack",
-    summary:
-      "A platform for Brazilian accounting firms. A Go and PostgreSQL API behind a Next.js front end, talking to government web services: filings and legal notices arrive as work a team can actually track.",
+    role: { en: "Founder engineer — the whole stack", pt: "Founder engineer — a stack inteira" },
+    summary: {
+      en: "A platform for Brazilian accounting firms. A Go and PostgreSQL API behind a Next.js front end, talking to government web services: filings and legal notices arrive as work a team can actually track.",
+      pt: "Uma plataforma para escritórios de contabilidade brasileiros. Uma API em Go e PostgreSQL atrás de um front end em Next.js, conversando com os web services do governo: guias e intimações chegam como tarefa que o time consegue acompanhar de verdade.",
+    },
     stack: ["Go", "PostgreSQL", "Next.js", "SEFAZ integrations"],
     accent: "#ff6b4a",
     links: [],
@@ -185,9 +249,11 @@ export const products: Product[] = [
   {
     id: "lepus",
     name: "Lepus",
-    role: "Solo project",
-    summary:
-      "A running app in React Native and Expo: background GPS, route drawing, pace and elevation splits, offline-first storage, and points, levels and achievements on top.",
+    role: { en: "Solo project", pt: "Projeto solo" },
+    summary: {
+      en: "A running app in React Native and Expo: background GPS, route drawing, pace and elevation splits, offline-first storage, and points, levels and achievements on top.",
+      pt: "Um app de corrida em React Native e Expo: GPS em segundo plano, desenho da rota, ritmo e elevação por trecho, armazenamento offline-first, e pontos, níveis e conquistas por cima.",
+    },
     stack: ["React Native", "Expo", "Supabase"],
     accent: "#ff4a8d",
     links: [],
@@ -203,20 +269,24 @@ export const products: Product[] = [
 export const projects: Project[] = [
   {
     id: "about",
-    title: "About me",
-    subtitle: "Who's driving",
-    description:
-      "Software engineer from Brazil, building SaaS platforms, mobile apps and automation for teams that ship on tight deadlines. I work end to end — database and API design, the interface people actually use, and the integrations in between.",
+    title: { en: "About me", pt: "Sobre mim" },
+    subtitle: { en: "Who's driving", pt: "Quem está dirigindo" },
+    description: {
+      en: "Software engineer from Brazil, building SaaS platforms, mobile apps and automation for teams that ship on tight deadlines. I work end to end — database and API design, the interface people actually use, and the integrations in between.",
+      pt: "Engenheiro de software brasileiro, construindo plataformas SaaS, apps mobile e automação para times que entregam com prazo apertado. Trabalho de ponta a ponta — desenho de banco de dados e API, a interface que as pessoas realmente usam, e as integrações no meio do caminho.",
+    },
     stack: ["TypeScript", "Go", "Node.js", "React"],
     color: "#ff6b4a",
     position: [0, 0, -26],
   },
   {
     id: "experience",
-    title: "Experience",
-    subtitle: "Where I build",
-    description:
-      "Product work across PontoGO, PeopleNity, Homefly and MeuProcesso: scalable back ends, third-party integrations that are not allowed to fail, and small teams moving fast without breaking what is already in production.",
+    title: { en: "Experience", pt: "Experiência" },
+    subtitle: { en: "Where I build", pt: "Onde eu construo" },
+    description: {
+      en: "Product work across PontoGO, PeopleNity, Homefly and MeuProcesso: scalable back ends, third-party integrations that are not allowed to fail, and small teams moving fast without breaking what is already in production.",
+      pt: "Trabalho de produto no PontoGO, PeopleNity, Homefly e MeuProcesso: back ends escaláveis, integrações com terceiros que não têm permissão de falhar, e times pequenos andando rápido sem quebrar o que já está em produção.",
+    },
     stack: ["Next.js", "PostgreSQL", "Redis", "Docker"],
     url: "https://www.linkedin.com/in/gabriel-angelo0/",
     color: "#4ac8ff",
@@ -224,40 +294,48 @@ export const projects: Project[] = [
   },
   {
     id: "saas",
-    title: "SaaS Platforms",
-    subtitle: "Products in production",
-    description:
-      "Plannea CRM, a platform for Brazilian accounting firms: a Go and PostgreSQL API behind a Next.js front end. It talks to government web services and tax data providers, turning filings and legal notices into work a team can track.",
+    title: { en: "SaaS Platforms", pt: "Plataformas SaaS" },
+    subtitle: { en: "Products in production", pt: "Produtos em produção" },
+    description: {
+      en: "Plannea CRM, a platform for Brazilian accounting firms: a Go and PostgreSQL API behind a Next.js front end. It talks to government web services and tax data providers, turning filings and legal notices into work a team can track.",
+      pt: "Plannea CRM, uma plataforma para escritórios de contabilidade brasileiros: uma API em Go e PostgreSQL atrás de um front end em Next.js. Ela conversa com web services do governo e provedores de dados fiscais, transformando guias e intimações em tarefa que o time consegue acompanhar.",
+    },
     stack: ["Go", "PostgreSQL", "Next.js", "REST integrations"],
     color: "#b04aff",
     position: [25.4, 0, 5.8],
   },
   {
     id: "automation",
-    title: "Automation & AI",
-    subtitle: "Work that runs itself",
-    description:
-      "WhatsApp integrations, n8n workflows and AI-assisted routines that take manual steps out of back-office operations — document intake, notifications, and data pulled from systems that were never meant to talk to each other.",
+    title: { en: "Automation & AI", pt: "Automação & IA" },
+    subtitle: { en: "Work that runs itself", pt: "Trabalho que roda sozinho" },
+    description: {
+      en: "WhatsApp integrations, n8n workflows and AI-assisted routines that take manual steps out of back-office operations — document intake, notifications, and data pulled from systems that were never meant to talk to each other.",
+      pt: "Integrações com WhatsApp, fluxos em n8n e rotinas com IA que tiram passos manuais da operação de back-office — recebimento de documentos, notificações, e dados puxados de sistemas que nunca foram feitos para conversar entre si.",
+    },
     stack: ["n8n", "WhatsApp API", "Node.js", "Supabase"],
     color: "#ffd24a",
     position: [11.3, 0, 23.4],
   },
   {
     id: "mobile",
-    title: "Mobile",
-    subtitle: "React Native",
-    description:
-      "Lepus, a running app built with React Native and Expo: background GPS tracking, route drawing, pace and elevation splits, offline-first storage, and a points system with levels, goals and achievements.",
+    title: { en: "Mobile", pt: "Mobile" },
+    subtitle: { en: "React Native", pt: "React Native" },
+    description: {
+      en: "Lepus, a running app built with React Native and Expo: background GPS tracking, route drawing, pace and elevation splits, offline-first storage, and a points system with levels, goals and achievements.",
+      pt: "Lepus, um app de corrida feito com React Native e Expo: rastreamento de GPS em segundo plano, desenho da rota, ritmo e elevação por trecho, armazenamento offline-first, e um sistema de pontos com níveis, metas e conquistas.",
+    },
     stack: ["React Native", "Expo", "Supabase", "Native maps"],
     color: "#4affa1",
     position: [-11.3, 0, 23.4],
   },
   {
     id: "teaching",
-    title: "Teaching & Open Source",
-    subtitle: "Passing it on",
-    description:
-      "Instructor at Digital College, teaching full stack development to new cohorts. Most of the course material and project starters are public — 86 repositories, from a first login screen to complete APIs.",
+    title: { en: "Teaching & Open Source", pt: "Ensino & Open Source" },
+    subtitle: { en: "Passing it on", pt: "Passando adiante" },
+    description: {
+      en: "Instructor at Digital College, teaching full stack development to new cohorts. Most of the course material and project starters are public — 86 repositories, from a first login screen to complete APIs.",
+      pt: "Instrutor na Digital College, ensinando desenvolvimento full stack para novas turmas. A maior parte do material do curso e dos projetos de partida é pública — 86 repositórios, de uma primeira tela de login a APIs completas.",
+    },
     stack: ["Mentoring", "Code review", "Open source"],
     url: "https://github.com/gabrielangelo0",
     color: "#ff4a8d",
@@ -265,10 +343,12 @@ export const projects: Project[] = [
   },
   {
     id: "contact",
-    title: "Contact",
-    subtitle: "Let's talk",
-    description:
-      "Open to product work, consulting, and conversations about SaaS architecture, integrations and web performance. Email is the fastest way to reach me — LinkedIn works too.",
+    title: { en: "Contact", pt: "Contato" },
+    subtitle: { en: "Let's talk", pt: "Vamos conversar" },
+    description: {
+      en: "Open to product work, consulting, and conversations about SaaS architecture, integrations and web performance. Email is the fastest way to reach me — LinkedIn works too.",
+      pt: "Aberto a trabalho de produto, consultoria, e conversas sobre arquitetura SaaS, integrações e performance web. E-mail é o jeito mais rápido de me encontrar — LinkedIn também funciona.",
+    },
     stack: ["Email", "LinkedIn", "GitHub"],
     color: "#7c6bff",
     position: [-20.4, 0, -16.2],

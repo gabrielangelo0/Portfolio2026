@@ -1,9 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { profile } from "@/lib/data";
+import { LanguageProvider } from "@/components/ui/LanguageProvider";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 import "./globals.css";
 
 const SITE = "https://portfolio.devfly.net";
-const TITLE = `${profile.name} — ${profile.role}`;
+// metadata de SEO fica só em inglês — Google, LinkedIn e WhatsApp leem uma
+// única versão, e trocar por cookie/middleware só pra isso não vale a pena
+const TITLE = `${profile.name} — ${profile.role.en}`;
 const DESCRIPTION = `Portfolio of ${profile.name}: SaaS platforms, mobile apps and automation — with a drivable version of the same story.`;
 
 export const metadata: Metadata = {
@@ -39,7 +43,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <LanguageProvider>
+          <LanguageToggle />
+          {children}
+        </LanguageProvider>
+      </body>
     </html>
   );
 }
