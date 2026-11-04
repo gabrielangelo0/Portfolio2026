@@ -810,6 +810,7 @@ kbd {
 }
 
 .lightbox__stage {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: grid;
@@ -828,6 +829,137 @@ kbd {
   height: auto;
   object-fit: contain;
   display: block;
+  transition: opacity 0.25s ease;
+}
+
+/* aparece enquanto a imagem ainda está baixando; a galeria inteira já começa
+   a pré-carregar ao abrir, então isso só pisca na primeiríssima visita */
+.lightbox__spinner {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+}
+
+.lightbox__spinner::after {
+  content: "";
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid var(--hairline);
+  border-top-color: var(--ink);
+  animation: lightbox-spin 0.8s linear infinite;
+}
+
+@keyframes lightbox-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lightbox__caption {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  padding: 5px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: rgba(10, 10, 14, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 590;
+  letter-spacing: 0.01em;
+}
+
+/* moldura de aparelho desenhada em CSS para capturas cruas, sem o celular
+   embutido na imagem — mantém a mesma leitura de "print de celular" das
+   capturas que já vieram com o aparelho. O acabamento imita titânio: banda
+   com gradiente metálico, anel interno preto antes da tela e botões
+   salientes nas bordas, em vez de um retângulo liso. */
+.lightbox__device {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 16px;
+  border-radius: 54px;
+  background: linear-gradient(155deg, #57575f 0%, #28282c 32%, #0c0c0e 78%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2),
+    0 30px 80px rgba(0, 0, 0, 0.55);
+}
+
+/* anel preto fino entre o metal e a tela, como no aparelho real */
+.lightbox__device::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  z-index: 1;
+  border-radius: 42px;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+.lightbox__device-notch {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92px;
+  height: 26px;
+  border-radius: 999px;
+  background: #050506;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  z-index: 3;
+}
+
+.lightbox__device-btn {
+  position: absolute;
+  z-index: 0;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #5c5c64, #19191c);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* encostados na borda (nunca saindo dela) — o palco corta com overflow:hidden
+   qualquer coisa que ultrapasse a moldura, então um offset negativo some */
+.lightbox__device-btn--mute {
+  left: 0;
+  top: 108px;
+  width: 3px;
+  height: 22px;
+}
+
+.lightbox__device-btn--vol-up {
+  left: 0;
+  top: 148px;
+  width: 3px;
+  height: 46px;
+}
+
+.lightbox__device-btn--vol-down {
+  left: 0;
+  top: 204px;
+  width: 3px;
+  height: 46px;
+}
+
+.lightbox__device-btn--power {
+  right: 0;
+  top: 168px;
+  width: 3px;
+  height: 66px;
+}
+
+.lightbox__device img {
+  position: relative;
+  z-index: 2;
+  border-radius: 40px;
 }
 
 .lightbox__foot {

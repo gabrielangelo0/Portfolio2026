@@ -37,7 +37,16 @@ export const stack: { group: string; items: string[] }[] = [
 export type ProductLink = {
   label: string;
   url: string;
-  kind: "site" | "play" | "appstore" | "repo";
+  kind: "site" | "app" | "play" | "appstore" | "repo";
+};
+
+export type Shot = {
+  src: string;
+  alt: string;
+  /** Legenda curta sobre a imagem, tipo "Antes" / "Depois" de um redesign. */
+  caption?: string;
+  /** A imagem é a captura de tela crua, sem moldura de aparelho — a galeria desenha uma. */
+  frame?: boolean;
 };
 
 export type Product = {
@@ -50,7 +59,7 @@ export type Product = {
   accent: string;
   links: ProductLink[];
   /** Galeria, para o que não tem página pública para onde apontar. */
-  shots?: { src: string; alt: string }[];
+  shots?: Shot[];
 };
 
 /**
@@ -78,13 +87,46 @@ export const products: Product[] = [
       },
     ],
     shots: [
-      { src: "/shots/pontogo/before-login.png", alt: "PontoGO login screen before the redesign" },
-      { src: "/shots/pontogo/before-home.png", alt: "PontoGO home screen before the redesign" },
-      { src: "/shots/pontogo/login.png", alt: "PontoGO login screen after the redesign" },
-      { src: "/shots/pontogo/home.png", alt: "PontoGO home screen after the redesign" },
-      { src: "/shots/pontogo/home-confirm.png", alt: "PontoGO clock-in confirmation" },
-      { src: "/shots/pontogo/requests.png", alt: "PontoGO time adjustment requests" },
-      { src: "/shots/pontogo/menu.png", alt: "PontoGO profile and settings menu" },
+      {
+        src: "/shots/pontogo/before-login.png",
+        alt: "PontoGO login screen before the redesign",
+        caption: "Antes",
+      },
+      {
+        src: "/shots/pontogo/before-home.png",
+        alt: "PontoGO home screen before the redesign",
+        caption: "Antes",
+      },
+      {
+        src: "/shots/pontogo/login.png",
+        alt: "PontoGO login screen after the redesign",
+        caption: "Depois",
+        frame: true,
+      },
+      {
+        src: "/shots/pontogo/home.png",
+        alt: "PontoGO home screen after the redesign",
+        caption: "Depois",
+        frame: true,
+      },
+      {
+        src: "/shots/pontogo/home-confirm.png",
+        alt: "PontoGO clock-in confirmation",
+        caption: "Depois",
+        frame: true,
+      },
+      {
+        src: "/shots/pontogo/requests.png",
+        alt: "PontoGO time adjustment requests",
+        caption: "Depois",
+        frame: true,
+      },
+      {
+        src: "/shots/pontogo/menu.png",
+        alt: "PontoGO profile and settings menu",
+        caption: "Depois",
+        frame: true,
+      },
     ],
   },
   {
@@ -107,7 +149,10 @@ export const products: Product[] = [
       "gRPC between internal services, REST at the edge, and one deploy that serves several brands from the same codebase.",
     stack: ["Go", "gRPC", "Docker"],
     accent: "#4affa1",
-    links: [],
+    links: [
+      { label: "peoplenity.com.br", url: "https://peoplenity.com.br/", kind: "site" },
+      { label: "app.peoplenity.com", url: "https://app.peoplenity.com/", kind: "app" },
+    ],
   },
   {
     id: "homefly",
@@ -118,9 +163,13 @@ export const products: Product[] = [
     accent: "#ffd24a",
     links: [],
     shots: [
-      { src: "/shots/homefly/login.jpg", alt: "Homefly login screen" },
-      { src: "/shots/homefly/dashboard.jpg", alt: "Homefly sales dashboard" },
-      { src: "/shots/homefly/login-dark.jpg", alt: "Homefly login screen in dark mode" },
+      { src: "/shots/homefly/login.jpg", alt: "Homefly login screen", frame: true },
+      { src: "/shots/homefly/dashboard.jpg", alt: "Homefly sales dashboard", frame: true },
+      {
+        src: "/shots/homefly/login-dark.jpg",
+        alt: "Homefly login screen in dark mode",
+        frame: true,
+      },
     ],
   },
   {

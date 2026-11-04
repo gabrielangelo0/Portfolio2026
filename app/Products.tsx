@@ -7,10 +7,22 @@ import { products, type Product } from "@/lib/data";
 /** Ícone curto por tipo de link, para o botão dizer para onde vai sem legenda. */
 const KIND_LABEL: Record<string, string> = {
   site: "Visit",
+  app: "Open app",
   play: "Google Play",
   appstore: "App Store",
   repo: "Code",
 };
+
+/**
+ * Esquenta o cache do navegador para essas URLs sem renderizar nada — só
+ * dispara o download. Repetir a mesma URL não custa nada, o browser dedup.
+ */
+function preload(srcs: string[]) {
+  srcs.forEach((src) => {
+    const img = new window.Image();
+    img.src = src;
+  });
+}
 
 /**
  * Galeria em tela cheia. Existe para o que não tem página pública: sem lugar
@@ -18,6 +30,7 @@ const KIND_LABEL: Record<string, string> = {
  */
 function Gallery({ product, onClose }: { product: Product; onClose: () => void }) {
   const [index, setIndex] = useState(0);
+  const [loaded, setLoaded] = useState<Record<string, boolean>>({});
   const shots = product.shots ?? [];
 
   const move = useCallback(
@@ -35,7 +48,31 @@ function Gallery({ product, onClose }: { product: Product; onClose: () => void }
     return () => window.removeEventListener("keydown", onKey);
   }, [move, onClose]);
 
+  // a galeria inteira já começa a baixar no momento em que abre — a hora de
+  // trocar de imagem, ela quase sempre já está no cache do navegador
+  useEffect(() => {
+    preload(shots.map((item) => item.src));
+  }, [shots]);
+
   if (shots.length === 0) return null;
+
+  const shot = shots[index];
+  const isLoaded = loaded[shot.src] ?? false;
+
+  const image = (
+    <Image
+      key={shot.src}
+      src={shot.src}
+      alt={shot.alt}
+      width={1200}
+      height={900}
+      sizes="(max-width: 820px) 92vw, 760px"
+      loading="eager"
+      unoptimized
+      onLoad={() => setLoaded((prev) => (prev[shot.src] ? prev : { ...prev, [shot.src]: true }))}
+      style={{ opacity: isLoaded ? 1 : 0 }}
+    />
+  );
 
   return (
     <div className="lightbox" role="dialog" aria-modal aria-label={`${product.name} screenshots`}>
@@ -53,17 +90,24 @@ function Gallery({ product, onClose }: { product: Product; onClose: () => void }
         </header>
 
         <div className="lightbox__stage">
+          {!isLoaded ? <span className="lightbox__spinner" aria-hidden /> : null}
+          {shot.caption ? <span className="lightbox__caption">{shot.caption}</span> : null}
           {/* eager: a galeria só monta quando alguém abre, e o lazy padrão
-              deixava o palco preto esperando um observador que nunca dispara */}
-          <Image
-            key={shots[index].src}
-            src={shots[index].src}
-            alt={shots[index].alt}
-            width={1200}
-            height={900}
-            sizes="(max-width: 820px) 92vw, 760px"
-            loading="eager"
-          />
+              deixava o palco preto esperando um observador que nunca dispara.
+              shot.frame marca captura crua, sem moldura — a própria captura
+              das telas "antes" já trazia o aparelho embutido na imagem. */}
+          {shot.frame ? (
+            <div className="lightbox__device">
+              <span className="lightbox__device-notch" />
+              <span className="lightbox__device-btn lightbox__device-btn--mute" />
+              <span className="lightbox__device-btn lightbox__device-btn--vol-up" />
+              <span className="lightbox__device-btn lightbox__device-btn--vol-down" />
+              <span className="lightbox__device-btn lightbox__device-btn--power" />
+              {image}
+            </div>
+          ) : (
+            image
+          )}
         </div>
 
         {shots.length > 1 ? (
@@ -135,7 +179,12 @@ export function Products() {
               ))}
 
               {product.shots?.length ? (
-                <button className="card__cta is-ghost" onClick={() => setOpen(product)}>
+                <button
+                  className="card__cta is-ghost"
+                  onClick={() => setOpen(product)}
+                  onMouseEnter={() => preload(product.shots!.map((item) => item.src))}
+                  onFocus={() => preload(product.shots!.map((item) => item.src))}
+                >
                   Screenshots
                 </button>
               ) : null}
