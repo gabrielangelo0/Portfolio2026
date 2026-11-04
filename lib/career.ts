@@ -61,8 +61,8 @@ export const MILESTONES: Milestone[] = [
     year: "2012",
     title: { en: "First lines of code", pt: "Primeiras linhas de código" },
     detail: {
-      en: "Java. Algorithms, objects, and the first real sense that software is built, not found.",
-      pt: "Java. Algoritmos, objetos, e a primeira noção de verdade de que software se constrói, não se encontra.",
+      en: "Java. Algorithms, objects, and the first real understanding that software is built, not found.",
+      pt: "Java. Algoritmos, objetos e a primeira compreensão real de que software é construído, não encontrado.",
     },
   },
   {
@@ -70,14 +70,14 @@ export const MILESTONES: Milestone[] = [
     year: "2015",
     title: { en: "The web calls", pt: "A web chama" },
     detail: {
-      en: "PHP. Forms, databases, and pages that finally did something.",
-      pt: "PHP. Formulários, banco de dados, e páginas que finalmente faziam alguma coisa.",
+      en: "PHP. Forms, databases, and the first pages that performed real functions.",
+      pt: "PHP. Formulários, bancos de dados e as primeiras páginas com funcionalidade real.",
     },
   },
   {
     at: 0.36,
     year: "2020",
-    title: { en: "Front end for real", pt: "Front end de verdade" },
+    title: { en: "The front-end craft", pt: "O ofício do front end" },
     detail: {
       en: "HTML, CSS and JavaScript. The interface stops being a detail and becomes the craft.",
       pt: "HTML, CSS e JavaScript. A interface deixa de ser detalhe e vira o ofício.",
@@ -86,19 +86,19 @@ export const MILESTONES: Milestone[] = [
   {
     at: 0.48,
     year: "2021",
-    title: { en: "Paid to code", pt: "Pago para programar" },
+    title: { en: "First developer role", pt: "Primeiro cargo como desenvolvedor" },
     detail: {
-      en: "First job as a developer — production code, deadlines and code review.",
-      pt: "Primeiro emprego como desenvolvedor — código em produção, prazo e code review.",
+      en: "Production code, deadlines and code review from day one.",
+      pt: "Código em produção, prazos e revisão de código desde o primeiro dia.",
     },
   },
   {
     at: 0.6,
     year: "2024",
-    title: { en: "Skin in the game", pt: "Com o próprio pescoço em jogo" },
+    title: { en: "Co-founder", pt: "Sócio-fundador" },
     detail: {
-      en: "Partner in a startup: building the product and carrying the outcome.",
-      pt: "Sócio numa startup: construindo o produto e carregando o resultado.",
+      en: "Co-founder of a startup, responsible for building the product and owning its outcomes.",
+      pt: "Sócio-fundador de uma startup, responsável pelo desenvolvimento do produto e pelos seus resultados.",
     },
   },
   {
@@ -106,8 +106,8 @@ export const MILESTONES: Milestone[] = [
     year: "2025",
     title: { en: "Passing it on", pt: "Passando adiante" },
     detail: {
-      en: "Full stack instructor at Digital College, teaching new cohorts to ship.",
-      pt: "Instrutor full stack na Digital College, ensinando novas turmas a colocar no ar.",
+      en: "Full-stack instructor at Digital College, training new cohorts to deliver production-ready software.",
+      pt: "Instrutor full stack na Digital College, formando novas turmas para a entrega de software em produção.",
     },
   },
   {
@@ -126,8 +126,8 @@ export const FINISH = {
   year: { en: "Today", pt: "Hoje" },
   title: { en: "Still driving", pt: "Ainda dirigindo" },
   detail: {
-    en: "Full Stack Developer at RT Data Consultoria, building Vertexa — the platform behind my own course, Devfly — on the side.",
-    pt: "Desenvolvedor Full Stack na RT Data Consultoria, construindo a Vertexa — a plataforma por trás do meu próprio curso, a Devfly — nas horas vagas.",
+    en: "Full Stack Developer at RT Data Consultoria, and founder of Vertexa, the platform behind my own course, Devfly.",
+    pt: "Desenvolvedor Full Stack na RT Data Consultoria e fundador da Vertexa, a plataforma por trás do meu próprio curso, a Devfly.",
   },
 };
 
