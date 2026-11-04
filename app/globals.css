@@ -821,10 +821,15 @@ kbd {
 }
 
 /* a imagem cabe no palco em vez de esticar: screenshot de celular e de tela
-   larga passam pelo mesmo quadro */
+   larga passam pelo mesmo quadro.
+   max-height em % não funciona aqui dentro da moldura (.lightbox__device não
+   tem altura própria definida, só max-height — então a % do filho não tem
+   contra quem resolver e a imagem campeava no tamanho nativo, gigante). Uma
+   altura em vh, calculada a partir do que sobra do painel, resolve nos dois
+   casos — com moldura ou sem. */
 .lightbox__stage img {
   max-width: 100%;
-  max-height: 100%;
+  max-height: calc(88vh - 170px);
   width: auto;
   height: auto;
   object-fit: contain;
