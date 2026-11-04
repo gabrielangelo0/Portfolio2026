@@ -247,6 +247,24 @@ export const products: Product[] = [
     links: [],
   },
   {
+    id: "vertexa",
+    name: "Vertexa",
+    role: {
+      en: "Founder engineer — the whole platform",
+      pt: "Founder engineer — a plataforma inteira",
+    },
+    summary: {
+      en: "A multi-tenant SaaS for course platforms, built after outgrowing a vendor tool. Go microservices behind a single gateway — catalog, enrollments, media and notifications — with Next.js apps for the student area and the course admin, video transcoding and signed playback through Mux, and identity on Zitadel. It now runs Devfly, my own programming course.",
+      pt: "Um SaaS multi-tenant para plataformas de curso, construído depois que uma ferramenta pronta ficou pequena. Microsserviços em Go atrás de um único gateway — catálogo, matrículas, mídia e notificações — com apps em Next.js para a área do aluno e o painel do curso, transcodificação e playback assinado de vídeo pelo Mux, e identidade no Zitadel. Hoje ela sustenta a Devfly, meu próprio curso de programação.",
+    },
+    stack: ["Go", "Next.js", "gRPC", "Zitadel", "Mux", "Terraform"],
+    accent: "#5b8cff",
+    links: [
+      { label: "curso.devfly.net", url: "https://curso.devfly.net/", kind: "site" },
+      { label: "members.devfly.net", url: "https://members.devfly.net/", kind: "app" },
+    ],
+  },
+  {
     id: "lepus",
     name: "Lepus",
     role: { en: "Solo project", pt: "Projeto solo" },
@@ -284,8 +302,8 @@ export const projects: Project[] = [
     title: { en: "Experience", pt: "Experiência" },
     subtitle: { en: "Where I build", pt: "Onde eu construo" },
     description: {
-      en: "Product work across PontoGO, PeopleNity, Homefly and MeuProcesso: scalable back ends, third-party integrations that are not allowed to fail, and small teams moving fast without breaking what is already in production.",
-      pt: "Trabalho de produto no PontoGO, PeopleNity, Homefly e MeuProcesso: back ends escaláveis, integrações com terceiros que não têm permissão de falhar, e times pequenos andando rápido sem quebrar o que já está em produção.",
+      en: "Three years building PontoGO from the inside, plus product work on PeopleNity, Homefly and MeuProcesso: scalable back ends and third-party integrations that are not allowed to fail. Now a Full Stack Developer at RT Data Consultoria.",
+      pt: "Três anos construindo o PontoGO por dentro, além de trabalho de produto no PeopleNity, Homefly e MeuProcesso: back ends escaláveis e integrações com terceiros que não têm permissão de falhar. Hoje, Desenvolvedor Full Stack na RT Data Consultoria.",
     },
     stack: ["Next.js", "PostgreSQL", "Redis", "Docker"],
     url: "https://www.linkedin.com/in/gabriel-angelo0/",

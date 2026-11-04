@@ -110,6 +110,15 @@ export const MILESTONES: Milestone[] = [
       pt: "Instrutor full stack na Digital College, ensinando novas turmas a colocar no ar.",
     },
   },
+  {
+    at: 0.85,
+    year: "2026",
+    title: { en: "New chapter", pt: "Novo capítulo" },
+    detail: {
+      en: "After PontoGO (Nov. 2022 – 2026), joined RT Data Consultoria as a Full Stack Developer.",
+      pt: "Depois do PontoGO (nov. 2022 – 2026), entrei na RT Data Consultoria como Desenvolvedor Full Stack.",
+    },
+  },
 ];
 
 /** O que está escrito na chegada, no alto da serra. */
@@ -117,8 +126,8 @@ export const FINISH = {
   year: { en: "Today", pt: "Hoje" },
   title: { en: "Still driving", pt: "Ainda dirigindo" },
   detail: {
-    en: "SaaS, mobile and automation in production — PontoGO, PeopleNity, Homefly and MeuProcesso.",
-    pt: "SaaS, mobile e automação em produção — PontoGO, PeopleNity, Homefly e MeuProcesso.",
+    en: "Full Stack Developer at RT Data Consultoria, building Vertexa — the platform behind my own course, Devfly — on the side.",
+    pt: "Desenvolvedor Full Stack na RT Data Consultoria, construindo a Vertexa — a plataforma por trás do meu próprio curso, a Devfly — nas horas vagas.",
   },
 };
 
